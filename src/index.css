@@ -1,0 +1,309 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: #3b82f6; /* Example, adjust as needed */
+  /* Jeton-inspired colors */
+  --jeton-bg: #f3f4f6; /* Light gray background */
+  --jeton-text: #1f2937; /* Dark gray text */
+  --jeton-hover: #1e40af; /* Darker blue for hover */
+}
+
+body {
+  font-family: 'Inter', sans-serif; /* Use a similar font to Jeton */
+  color: var(--jeton-text);
+  background-color: var(--jeton-bg);
+}
+
+/* Header Styles - Keep your existing header styles, adjust if needed */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
+  z-index: 100;
+  transition: background-color 0.3s ease;
+}
+
+.header.scrolled {
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.menu-item {
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.menu-item:hover {
+  color: var(--primary-color);
+}
+
+/* Language dropdown styling */
+.language-dropdown {
+  position: relative;
+}
+
+.language-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  z-index: 50;
+  min-width: 150px;
+  margin-top: 0.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+}
+
+.language-menu.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.language-option {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, padding-left 0.2s ease;
+}
+
+.language-option:hover {
+  background-color: #f3f4f6;
+  padding-left: 1.5rem;
+}
+
+.language-option.active {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* Left Menu Mobile Styles */
+.mobile-menu-toggle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .left-menu-container {
+    position: relative;
+    z-index: 40;
+  }
+}
+
+/* Footer Styles - Keep, adjust if needed */
+.footer {
+  background-color: #1f2937;
+  color: #f3f4f6;
+  padding: 3rem 1rem;
+}
+
+/* Modal Styles - Keep, adjust if needed */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+  max-width: 80%; /* Add max-width */
+  width: auto;
+}
+
+@media (max-width: 767px) {
+  .modal-content {
+    max-width: 95%;
+    padding: 1.5rem;
+  }
+}
+
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #111827;
+}
+
+.modal-content-inner {
+  margin-top: 1rem;
+}
+
+/* Form Inputs - Keep, adjust if needed */
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+/* Authentication Forms */
+.login-form-container,
+.register-form-container {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 767px) {
+  .login-form-container,
+  .register-form-container {
+    max-width: 100%;
+  }
+}
+
+/* Animations - Keep, adjust if needed */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.slide-in-left {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.slide-in-right {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.scale-in {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.visible {
+  opacity: 1;
+  transform: translate(0) scale(1);
+}
+
+/* Overlay for gallery items */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gallery-item:hover .overlay {
+  opacity: 1;
+}
+
+.overlay-box {
+  text-align: center;
+  padding: 1rem;
+}
+
+.overlay-box h4 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.overlay-.overlay-box p {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Animation timing classes */
+.animation-time-1s {
+  animation-duration: 1s;
+}
+
+.delay-06s {
+  animation-delay: 0.6s;
+}
+
+.delay-08s {
+  animation-delay: 0.8s;
+}
+
+.delay-1s {
+  animation-delay: 1s;
+}
+
+/* Social icons hover effect */
+.social-icons a {
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.social-icons a:hover {
+  transform: translateY(-5px);
+}
