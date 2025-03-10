@@ -128,7 +128,9 @@ function App() {
       <main className="flex flex-grow pt-16">
         <LeftMenu setActiveModal={setActiveModal} />
         <div className="flex items-center justify-center flex-grow">
-          <Animation />
+          <Animation
+            style={{ position: "absolute", inset: 0, objectFit: "cover" }}
+          />
         </div>
       </main>
 
