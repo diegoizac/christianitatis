@@ -6,10 +6,7 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = () => {
   return (
-    <footer
-      className="bg-gray-800 text-white py-6 fixed bottom-0 w-full"
-      id="row-footer"
-    >
+    <footer className="text-white py-6 fixed bottom-0 w-full" id="row-footer">
       <div className="container mx-auto text-center">
         <div className="social-icons flex justify-center space-x-6 mb-4">
           {/* Facebook */}

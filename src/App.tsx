@@ -191,7 +191,7 @@ function App() {
             <div className="text-center">
               <img
                 className="inline"
-                src="https://christianitatis.org/wp-content/uploads/2024/03/Design-sem-nome-26.png"
+                src="/src/assets/images/PIX-Christianitatis.png"
                 alt="pix"
               />
             </div>

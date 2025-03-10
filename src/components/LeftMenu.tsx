@@ -57,11 +57,7 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
       <nav
         className={`
           flex flex-col items-start justify-center py-8 px-4 h-screen
-          ${
-            isMobile
-              ? "fixed left-0 top-0 z-50 bg-transparent shadow-lg w-64 transform transition-transform duration-300 ease-in-out"
-              : ""
-          }
+          fixed left-0 top-0 z-50 bg-transparent shadow-lg w-64 transform transition-transform duration-300 ease-in-out
           ${isMobile && !isMenuOpen ? "-translate-x-full" : "translate-x-0"}
         `}
       >

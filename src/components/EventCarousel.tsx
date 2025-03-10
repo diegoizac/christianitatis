@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface EventCarouselProps {
-  events: { imageUrl: string; title: string; eventPath: string; videoUrl?: string }[];
+  events: {
+    imageUrl: string;
+    title: string;
+    eventPath: string;
+    videoUrl?: string;
+  }[];
   onOpenVideo?: (videoUrl: string) => void;
 }
 
-const EventCarousel: React.FC<EventCarouselProps> = ({ events, onOpenVideo }) => {
+const EventCarousel: React.FC<EventCarouselProps> = ({
+  events,
+  onOpenVideo,
+}) => {
   const [current, setCurrent] = useState(0);
   const length = events.length;
 
@@ -21,7 +29,7 @@ const EventCarousel: React.FC<EventCarouselProps> = ({ events, onOpenVideo }) =>
     return null;
   }
 
-    const handleVideoClick = (videoUrl: string) => {
+  const handleVideoClick = (videoUrl: string) => {
     if (onOpenVideo) {
       onOpenVideo(videoUrl);
     }
@@ -32,27 +40,52 @@ const EventCarousel: React.FC<EventCarouselProps> = ({ events, onOpenVideo }) =>
       {events.map((slide, index) => {
         return (
           <div
-            className={index === current ? 'opacity-100 transition-opacity duration-1000 ease-in-out' : 'opacity-0'}
+            className={
+              index === current
+                ? "opacity-100 transition-opacity duration-1000 ease-in-out"
+                : "opacity-0"
+            }
             key={index}
           >
             {index === current && (
               <>
                 {slide.videoUrl ? (
-                  <a href="#" onClick={(e) => {e.preventDefault(); handleVideoClick(slide.videoUrl);}} className='cursor-pointer'>
-                    <img src={slide.imageUrl} alt={slide.title} className="w-full h-64 object-cover" />
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (slide.videoUrl) handleVideoClick(slide.videoUrl);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <img
+                      src={slide.imageUrl}
+                      alt={slide.title}
+                      className="w-full h-64 object-cover cursor-pointer"
+                    />
                   </a>
                 ) : (
-                  <img src={slide.imageUrl} alt={slide.title} className="w-full h-64 object-cover" />
+                  <img
+                    src={slide.imageUrl}
+                    alt={slide.title}
+                    className="w-full h-64 object-cover cursor-pointer"
+                  />
                 )}
               </>
             )}
           </div>
         );
       })}
-      <button className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full" onClick={prevSlide}>
+      <button
+        className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+        onClick={prevSlide}
+      >
         &#10094;
       </button>
-      <button className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full" onClick={nextSlide}>
+      <button
+        className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
+        onClick={nextSlide}
+      >
         &#10095;
       </button>
     </section>
