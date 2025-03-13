@@ -18,7 +18,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-i18next": "^15.4.1",
-    "three": "^0.174.0"
+    "three": "^0.174.0",
+    "vite-plugin-static-copy": "^2.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
