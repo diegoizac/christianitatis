@@ -4,7 +4,7 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 
 const Animation = ({ style }: { style?: React.CSSProperties }) => {
   const { scene } = useGLTF(
-    "/src/assets/animations/logo-3d-christianitatisv001.glb"
+    "./assets/animations/logo-3d-christianitatisv001.glb"
   );
   return (
     <Canvas style={{ height: "100vh", width: "100%", ...style }}>

@@ -23,13 +23,13 @@ function App() {
 
   const featuredEvents = [
     {
-      imageUrl: "src/assets/images/banner-nick-ponta-grossa.png",
+      imageUrl: "./assets/images/banner-nick-ponta-grossa.png",
       title: "Destaque Ponta Grossa",
       eventPath: "/evento-pg",
       videoUrl: "src/assets/videos/video-nick-ponta-grossa.mp4",
     },
     {
-      imageUrl: "src/assets/images/banner-nick-belem.png",
+      imageUrl: "./assets/images/banner-nick-belem.png",
       title: "Destaque Belém",
       eventPath: "/evento-belem",
       videoUrl: "src/assets/videos/video-nick-belem.mp4",
@@ -38,7 +38,7 @@ function App() {
 
   const events = [
     {
-      imageUrl: "src/assets/images/nick-brasilia.png",
+      imageUrl: "./assets/images/nick-brasilia.png",
       title: "15/04 - Brasília",
       location: "Campus Arena da Sara Nossa Terra",
       address: "Quadra 02, Com. 11, Lote 01, Vicente Pires, DF.",
@@ -46,7 +46,7 @@ function App() {
       info: "@copevdf",
     },
     {
-      imageUrl: "src/assets/images/nick-goiania.png",
+      imageUrl: "./assets/images/nick-goiania.png",
       title: "16/04 - Goiânia",
       location: "Arena Videira Bueno",
       address: "Av. T-7, 1361, Goiânia, GO.",
@@ -54,7 +54,7 @@ function App() {
       info: "(062) 3251-0505",
     },
     {
-      imageUrl: "src/assets/images/nick-ponta-grossa.png",
+      imageUrl: "./assets/images/nick-ponta-grossa.png",
       title: "17/04 - Ponta Grossa",
       location: "Centro de Convenções do Avivamento",
       address: "Av. Maria Rita Perpétuo da Cruz S/N, Ponta Grossa, PR.",
@@ -63,7 +63,7 @@ function App() {
       videoUrl: "src/assets/videos/video-nick-ponta-grossa.mp4",
     },
     {
-      imageUrl: "src/assets/images/nick-belo-horizonte.png",
+      imageUrl: "./assets/images/nick-belo-horizonte.png",
       title: "18/04 - Belo Horizonte",
       location: "Igreja Batista Getsêmani",
       address: "Rua Cassiano Campolina 360, Belo Horizonte, MG.",
@@ -71,7 +71,7 @@ function App() {
       info: "(031) 3448-9898",
     },
     {
-      imageUrl: "src/assets/images/nick-belem.png",
+      imageUrl: "./assets/images/nick-belem.png",
       title: "20/04 - Belém",
       location: "Catedral da Família Foursquare",
       address: "Tv Barão de Igarapé Mirim 977, Guamá, Belém, PA.",
@@ -191,7 +191,7 @@ function App() {
             <div className="text-center">
               <img
                 className="inline"
-                src="/src/assets/images/PIX-Christianitatis.png"
+                src="./assets/images/PIX-Christianitatis.png"
                 alt="pix"
               />
             </div>
