@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Heart, Mail, Menu, X } from "lucide-react";
+import { Calendar, Heart, Mail, Menu, ArrowLeft } from "lucide-react";
 
 interface LeftMenuProps {
   setActiveModal: (modalId: string | null) => void;
@@ -46,7 +46,7 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
           aria-label="Toggle menu"
         >
           {isMenuOpen ? (
-            <X className="h-6 w-6" />
+            <ArrowLeft className="h-6 w-6" />
           ) : (
             <Menu className="h-6 w-6" />
           )}
@@ -113,7 +113,7 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
               <span>Login</span>
             </a>
           </li>
-          <li>
+          {/* <li>
             <a
               href="#"
               className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium text-lg w-full"
@@ -124,7 +124,7 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
             >
               <span>Idioma</span>
             </a>
-          </li>
+          </li> */}
         </ul>
       </nav>
 

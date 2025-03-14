@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Globe, ChevronDown, User } from 'lucide-react';
+import React, { useState } from "react";
+import { Globe, ChevronDown, User } from "lucide-react";
 
 interface HeaderProps {
   isScrolled: boolean;
@@ -8,15 +8,15 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isScrolled, setActiveModal }) => {
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
-  
+
   return (
-    <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
+    <header className={`header ${isScrolled ? "scrolled" : ""}`}>
       <div className="container mx-auto flex items-center justify-between">
         <a href="/" className="text-2xl font-bold">
-          Christianitatis
+          Home
         </a>
 
-        <nav className={`header-menu`}>
+        {/* <nav className={`header-menu`}>
           <ul className="flex space-x-6 items-center">
             <li className="relative">
               <button 
@@ -48,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({ isScrolled, setActiveModal }) => {
               </button>
             </li>
           </ul>
-        </nav>
+        </nav> */}
       </div>
     </header>
   );
