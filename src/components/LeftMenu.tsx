@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Heart, Mail, Menu, ArrowLeft } from "lucide-react";
+import { Calendar, Heart, Mail, Home } from "lucide-react";
 
 interface LeftMenuProps {
   setActiveModal: (modalId: string | null) => void;
@@ -25,10 +25,6 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
     return () => window.removeEventListener("resize", checkIfMobile);
   }, []);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
   const handleMenuItemClick = (modalId: string) => {
     setActiveModal(modalId);
     if (isMobile) {
@@ -38,21 +34,14 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
 
   return (
     <div className="left-menu-container relative">
-      {/* Mobile toggle button */}
       {isMobile && (
         <button
-          className="mobile-menu-toggle fixed top-20 left-4 z-50 bg-white bg-opacity-75 p-2 rounded-full shadow-md border border-gray-300"
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
+          className="absolute top-4 left-4 z-50 bg-white p-2 rounded-md shadow-md"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          {isMenuOpen ? (
-            <ArrowLeft className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
+          Menu
         </button>
       )}
-
       {/* Menu content - always visible on desktop, toggleable on mobile */}
       <nav
         className={`
@@ -62,46 +51,61 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
         `}
       >
         <ul className="space-y-6 w-full">
+          {!isMobile && (
+            <li>
+              <a
+                href="#"
+                className="flex items-center space-x-2 text-gray-800 hover:text-blue-600 font-medium text-lg w-full bg-white bg-opacity-75 p-2 rounded-md shadow-md"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleMenuItemClick("home");
+                }}
+              >
+                <Home className="h-5 w-5 mr-2" />
+                <span>Home</span>
+              </a>
+            </li>
+          )}
           <li>
             <a
               href="#"
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium text-lg w-full"
+              className="flex items-center space-x-2 text-gray-800 hover:text-blue-600 font-medium text-lg w-full bg-white bg-opacity-75 p-2 rounded-md shadow-md"
               onClick={(e) => {
                 e.preventDefault();
                 handleMenuItemClick("eventos-modal");
               }}
             >
-              <Calendar className="h-5 w-5" />
+              <Calendar className="h-5 w-5 mr-2" />
               <span>Eventos</span>
             </a>
           </li>
           <li>
             <a
               href="#"
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium text-lg w-full"
+              className="flex items-center space-x-2 text-gray-800 hover:text-blue-600 font-medium text-lg w-full bg-white bg-opacity-75 p-2 rounded-md shadow-md"
               onClick={(e) => {
                 e.preventDefault();
                 handleMenuItemClick("apoie-modal");
               }}
             >
-              <Heart className="h-5 w-5" />
+              <Heart className="h-5 w-5 mr-2" />
               <span>Apoie o Movimento</span>
             </a>
           </li>
           <li>
             <a
               href="#"
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium text-lg w-full"
+              className="flex items-center space-x-2 text-gray-800 hover:text-blue-600 font-medium text-lg w-full bg-white bg-opacity-75 p-2 rounded-md shadow-md"
               onClick={(e) => {
                 e.preventDefault();
                 handleMenuItemClick("contato-modal");
               }}
             >
-              <Mail className="h-5 w-5" />
+              <Mail className="h-5 w-5 mr-2" />
               <span>Contato</span>
             </a>
           </li>
-          <li>
+          {/* <li>
             <a
               href="#"
               className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium text-lg w-full"
@@ -112,7 +116,7 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
             >
               <span>Login</span>
             </a>
-          </li>
+          </li> */}
           {/* <li>
             <a
               href="#"
@@ -127,14 +131,6 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
           </li> */}
         </ul>
       </nav>
-
-      {/* Overlay for mobile to close menu when clicking outside */}
-      {isMobile && isMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30"
-          onClick={() => setIsMenuOpen(false)}
-        ></div>
-      )}
     </div>
   );
 };

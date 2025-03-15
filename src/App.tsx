@@ -6,15 +6,12 @@ import Modal from "./components/Modal";
 import LeftMenu from "./components/LeftMenu";
 import EventCarousel from "./components/EventCarousel";
 import EventCard from "./components/EventCard";
-import LoginForm from "./components/LoginForm";
-import RegisterForm from "./components/RegisterForm";
 import Animation from "./components/Animation";
 
 function App() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const [authMode, setAuthMode] = useState<"login" | "register">("login");
 
   const openVideoModal = (url: string) => {
     setVideoUrl(url);
@@ -81,6 +78,20 @@ function App() {
     },
   ];
 
+  const cityEvents = [
+    {
+      city: "Ponta Grossa",
+      videoUrl: "src/assets/videos/video-nick-ponta-grossa.mp4",
+      post: "Evento incrível em Ponta Grossa!",
+    },
+    {
+      city: "Belém",
+      videoUrl: "src/assets/videos/video-nick-belem.mp4",
+      post: "Não perca o evento em Belém!",
+    },
+    // Adicione mais eventos conforme necessário
+  ];
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -121,6 +132,13 @@ function App() {
     };
   }, []);
 
+  // Adicionar função de envio para o formulário de contato
+  const handleContactFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Aqui você pode adicionar a lógica para enviar os dados do formulário
+    alert("Formulário enviado com sucesso!");
+  };
+
   return (
     <div className="main-container bg-gray-100 relative min-h-screen">
       <Header isScrolled={isScrolled} setActiveModal={setActiveModal} />
@@ -147,6 +165,31 @@ function App() {
           <h2 className="text-2xl font-bold mb-4">Próximos Eventos</h2>
           {/* Event Carousel */}
           <EventCarousel events={featuredEvents} onOpenVideo={openVideoModal} />
+
+          {/* Adicionar vídeos e posts específicos para cada cidade */}
+          <div className="mt-6">
+            <h3 className="text-xl font-semibold mb-2">Eventos por Cidade</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {cityEvents.map(
+                (
+                  cityEvent: { city: string; videoUrl: string; post: string },
+                  index: number
+                ) => (
+                  <div
+                    key={index}
+                    className="bg-white p-4 rounded-lg shadow-md"
+                  >
+                    <h4 className="text-lg font-bold mb-2">{cityEvent.city}</h4>
+                    <video controls className="w-full mb-2">
+                      <source src={cityEvent.videoUrl} type="video/mp4" />
+                      Seu navegador não suporta o elemento de vídeo.
+                    </video>
+                    <p>{cityEvent.post}</p>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
 
           <p className="mt-6">
             Aqui você encontra informações sobre os próximos eventos da
@@ -218,7 +261,7 @@ function App() {
             Tem dúvidas, sugestões ou quer saber mais sobre a Christianitatis?
             Entre em contato conosco!
           </p>
-          <form className="mb-6">
+          <form className="mb-6" onSubmit={handleContactFormSubmit}>
             <input type="text" placeholder="Seu Nome" className="form-input" />
             <input
               type="email"
@@ -272,24 +315,6 @@ function App() {
               <i className="fab fa-instagram fa-lg"></i>
             </a>
           </div>
-        </div>
-      </Modal>
-
-      <Modal
-        id="login-modal"
-        isOpen={activeModal === "login-modal"}
-        onClose={() => {
-          setActiveModal(null);
-          setAuthMode("login"); // Reset to login view when closing
-        }}
-        title=""
-      >
-        <div className="modal-content-inner">
-          {authMode === "login" ? (
-            <LoginForm onSwitchToRegister={() => setAuthMode("register")} />
-          ) : (
-            <RegisterForm onSwitchToLogin={() => setAuthMode("login")} />
-          )}
         </div>
       </Modal>
 

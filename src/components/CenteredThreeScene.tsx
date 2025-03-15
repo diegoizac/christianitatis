@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import * as THREE from 'three';
+import React, { useEffect, useRef } from "react";
+import * as THREE from "three";
 
 const CenteredThreeScene: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -12,7 +12,12 @@ const CenteredThreeScene: React.FC = () => {
 
     // Scene setup
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     containerRef.current.appendChild(renderer.domElement);
@@ -31,9 +36,21 @@ const CenteredThreeScene: React.FC = () => {
       new THREE.SphereGeometry(0.5, 16, 16),
     ];
     const materials = [
-      new THREE.MeshPhongMaterial({ color: 0xff0000, specular: 0x555555, shininess: 30 }), // Red
-      new THREE.MeshPhongMaterial({ color: 0x0000ff, specular: 0x555555, shininess: 30 }), // Blue
-      new THREE.MeshPhongMaterial({ color: 0x00ff00, specular: 0x555555, shininess: 30 }), // Green
+      new THREE.MeshPhongMaterial({
+        color: 0xffd700,
+        specular: 0xffffff,
+        shininess: 100,
+      }), // Gold
+      new THREE.MeshPhongMaterial({
+        color: 0x1e90ff,
+        specular: 0xffffff,
+        shininess: 100,
+      }), // Dodger Blue
+      new THREE.MeshPhongMaterial({
+        color: 0x32cd32,
+        specular: 0xffffff,
+        shininess: 100,
+      }), // Lime Green
     ];
 
     const spheres: THREE.Mesh[] = [];
@@ -65,12 +82,14 @@ const CenteredThreeScene: React.FC = () => {
       // Highlight intersected sphere
       if (intersects.length > 0) {
         const intersected = intersects[0].object as THREE.Mesh;
-          (intersected.material as THREE.MeshPhongMaterial).emissive.setHex(0x555555); // Make it glow
+        (intersected.material as THREE.MeshPhongMaterial).emissive.setHex(
+          0x555555
+        ); // Make it glow
       }
     };
 
     // Add mouse move listener
-    window.addEventListener('mousemove', onMouseMove, false);
+    window.addEventListener("mousemove", onMouseMove, false);
 
     const animate = () => {
       requestAnimationFrame(animate);
@@ -93,20 +112,25 @@ const CenteredThreeScene: React.FC = () => {
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousemove", onMouseMove);
       if (containerRef.current) {
         containerRef.current.removeChild(renderer.domElement);
       }
-      geometries.forEach(geometry => geometry.dispose());
-      materials.forEach(material => material.dispose());
+      geometries.forEach((geometry) => geometry.dispose());
+      materials.forEach((material) => material.dispose());
     };
   }, []);
 
-  return <div ref={containerRef} className="w-full h-full flex items-center justify-center"></div>;
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-full flex items-center justify-center"
+    ></div>
+  );
 };
 
 export default CenteredThreeScene;

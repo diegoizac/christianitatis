@@ -12,9 +12,9 @@ const Header: React.FC<HeaderProps> = ({ isScrolled, setActiveModal }) => {
   return (
     <header className={`header ${isScrolled ? "scrolled" : ""}`}>
       <div className="container mx-auto flex items-center justify-between">
-        <a href="/" className="text-2xl font-bold">
+        {/* <a href="/" className="text-2xl font-bold">
           Home
-        </a>
+        </a> */}
 
         {/* <nav className={`header-menu`}>
           <ul className="flex space-x-6 items-center">
