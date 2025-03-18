@@ -50,6 +50,21 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
           ${isMobile && !isMenuOpen ? "-translate-x-full" : "translate-x-0"}
         `}
       >
+        {isMobile && (
+          <li>
+            <a
+              href="#"
+              className="flex items-center space-x-2 text-gray-800 hover:text-blue-600 font-medium text-lg w-full bg-white bg-opacity-75 p-2 rounded-md shadow-md"
+              onClick={(e) => {
+                e.preventDefault();
+                handleMenuItemClick("home");
+              }}
+            >
+              <Home className="h-5 w-5 mr-2" />
+              <span>Home</span>
+            </a>
+          </li>
+        )}
         <ul className="space-y-6 w-full">
           {!isMobile && (
             <li>
@@ -131,6 +146,18 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
           </li> */}
         </ul>
       </nav>
+      {/* Adicionar botão de voltar no menu lateral esquerdo para mobile */}
+      {isMobile && isMenuOpen && (
+        <button
+          className="absolute top-4 right-4 z-50 bg-white p-2 rounded-md shadow-md"
+          onClick={() => {
+            setIsMenuOpen(false);
+            handleMenuItemClick("home");
+          }}
+        >
+          Voltar
+        </button>
+      )}
     </div>
   );
 };

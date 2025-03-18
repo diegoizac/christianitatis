@@ -11,9 +11,9 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif; /* Use a similar font to Jeton */
+  font-family: "Inter", sans-serif; /* Use a similar font to Jeton */
   color: var(--jeton-text);
-  background-color: var(--jeton-bg);
+  background-color: white;
 }
 
 /* Header Styles - Keep your existing header styles, adjust if needed */
@@ -96,7 +96,7 @@ body {
     align-items: center;
     justify-content: center;
   }
-  
+
   .left-menu-container {
     position: relative;
     z-index: 40;
@@ -105,8 +105,8 @@ body {
 
 /* Footer Styles - Keep, adjust if needed */
 .footer {
-  background-color: #1f2937;
-  color: #f3f4f6;
+  background-color: white; /* Fundo branco para todo o rodapé */
+  color: #1f2937; /* Cor do texto consistente com o menu */
   padding: 3rem 1rem;
 }
 
@@ -260,10 +260,6 @@ body {
   justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease;
-}
-
-.gallery-item:hover .overlay {
-  opacity: 1;
 }
 
 .overlay-box {

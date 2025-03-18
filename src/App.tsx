@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Modal from "./components/Modal";
@@ -12,24 +12,30 @@ function App() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
-
-  const openVideoModal = (url: string) => {
-    setVideoUrl(url);
-    setActiveModal("video-modal");
-  };
+  const [email, setEmail] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [activeEvent, setActiveEvent] = useState<{
+    imageUrl: string;
+    title: string;
+    location: string;
+    address: string;
+    time: string;
+    info: string;
+    videoUrl?: string;
+  } | null>(null);
 
   const featuredEvents = [
     {
       imageUrl: "./assets/images/banner-nick-ponta-grossa.png",
       title: "Destaque Ponta Grossa",
       eventPath: "/evento-pg",
-      videoUrl: "src/assets/videos/video-nick-ponta-grossa.mp4",
+      videoUrl: "/assets/videos/video-nick-ponta-grossa.mp4",
     },
     {
       imageUrl: "./assets/images/banner-nick-belem.png",
       title: "Destaque Belém",
       eventPath: "/evento-belem",
-      videoUrl: "src/assets/videos/video-nick-belem.mp4",
+      videoUrl: "/assets/videos/video-nick-belem.mp4",
     },
   ];
 
@@ -57,7 +63,7 @@ function App() {
       address: "Av. Maria Rita Perpétuo da Cruz S/N, Ponta Grossa, PR.",
       time: "19H",
       info: "(042) 3223-7870",
-      videoUrl: "src/assets/videos/video-nick-ponta-grossa.mp4",
+      videoUrl: "/assets/videos/video-nick-ponta-grossa.mp4",
     },
     {
       imageUrl: "./assets/images/nick-belo-horizonte.png",
@@ -74,19 +80,19 @@ function App() {
       address: "Tv Barão de Igarapé Mirim 977, Guamá, Belém, PA.",
       time: "18H",
       info: "(091) 99981-2091",
-      videoUrl: "src/assets/videos/video-nick-belem.mp4",
+      videoUrl: "/assets/videos/video-nick-belem.mp4",
     },
   ];
 
   const cityEvents = [
     {
       city: "Ponta Grossa",
-      videoUrl: "src/assets/videos/video-nick-ponta-grossa.mp4",
+      videoUrl: "/assets/videos/video-nick-ponta-grossa.mp4",
       post: "Evento incrível em Ponta Grossa!",
     },
     {
       city: "Belém",
-      videoUrl: "src/assets/videos/video-nick-belem.mp4",
+      videoUrl: "/assets/videos/video-nick-belem.mp4",
       post: "Não perca o evento em Belém!",
     },
     // Adicione mais eventos conforme necessário
@@ -132,27 +138,74 @@ function App() {
     };
   }, []);
 
-  // Adicionar função de envio para o formulário de contato
-  const handleContactFormSubmit = (e: React.FormEvent) => {
+  // Função para validar o email
+  const validateEmail = (email: string) => {
+    const re = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    return re.test(email);
+  };
+
+  // Modificar a função de envio do formulário para incluir a lógica de envio
+  const handleContactFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aqui você pode adicionar a lógica para enviar os dados do formulário
-    alert("Formulário enviado com sucesso!");
+    if (!validateEmail(email)) {
+      setErrorMessage("Insira um email válido. O campo é obrigatório.");
+      return;
+    }
+    setErrorMessage("");
+
+    // Exemplo de envio de dados para uma API fictícia
+    try {
+      const response = await fetch("https://api.exemplo.com/enviar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          // Adicione outros campos do formulário aqui
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao enviar o formulário");
+      }
+
+      alert("Formulário enviado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao enviar o formulário:", error);
+      setErrorMessage(
+        "Erro ao enviar o formulário. Tente novamente mais tarde."
+      );
+    }
+  };
+
+  // Modificar o EventCard para abrir o modal com detalhes
+  const handleEventClick = (event: {
+    imageUrl: string;
+    title: string;
+    location: string;
+    address: string;
+    time: string;
+    info: string;
+  }) => {
+    setActiveEvent(event);
+    setActiveModal("event-details-modal");
   };
 
   return (
     <div className="main-container bg-gray-100 relative min-h-screen">
-      <Header isScrolled={isScrolled} setActiveModal={setActiveModal} />
-
-      <main className="flex flex-grow pt-16">
-        <LeftMenu setActiveModal={setActiveModal} />
-        <div className="flex items-center justify-center flex-grow">
-          <Animation
-            style={{ position: "absolute", inset: 0, objectFit: "cover" }}
-          />
-        </div>
-      </main>
-
-      <Footer setActiveModal={setActiveModal} />
+      <Suspense fallback={<div>Carregando...</div>}>
+        <Header isScrolled={isScrolled} setActiveModal={setActiveModal} />
+        <main className="flex flex-grow pt-16">
+          <LeftMenu setActiveModal={setActiveModal} />
+          <div className="flex items-center justify-center flex-grow">
+            <Animation
+              style={{ position: "absolute", inset: 0, objectFit: "cover" }}
+            />
+          </div>
+        </main>
+        <Footer setActiveModal={setActiveModal} />
+      </Suspense>
 
       {/* Modals */}
       <Modal
@@ -164,7 +217,7 @@ function App() {
         <div className="modal-content-inner">
           <h2 className="text-2xl font-bold mb-4">Próximos Eventos</h2>
           {/* Event Carousel */}
-          <EventCarousel events={featuredEvents} onOpenVideo={openVideoModal} />
+          <EventCarousel events={featuredEvents} />
 
           {/* Adicionar vídeos e posts específicos para cada cidade */}
           <div className="mt-6">
@@ -207,7 +260,7 @@ function App() {
                 time={event.time}
                 info={event.info}
                 videoUrl={event.videoUrl}
-                onOpenVideo={openVideoModal}
+                onClick={() => handleEventClick(event)}
               />
             ))}
           </div>
@@ -267,7 +320,10 @@ function App() {
               type="email"
               placeholder="Seu E-mail"
               className="form-input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
+            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
             <input
               type="text"
               placeholder="Assunto da Mensagem"
@@ -335,6 +391,42 @@ function App() {
             </video>
           )}
         </div>
+      </Modal>
+
+      <Modal
+        id="event-details-modal"
+        isOpen={activeModal === "event-details-modal"}
+        onClose={() => setActiveModal(null)}
+        title={activeEvent?.title || "Detalhes do Evento"}
+      >
+        {activeEvent && (
+          <div className="modal-content-inner">
+            {activeEvent.videoUrl ? (
+              <video controls autoPlay className="w-full h-auto mb-4">
+                <source src={activeEvent.videoUrl} type="video/mp4" />
+                Seu navegador não suporta o elemento de vídeo.
+              </video>
+            ) : (
+              <img
+                src={activeEvent.imageUrl}
+                alt={activeEvent.title}
+                className="w-full h-auto object-contain mb-4"
+              />
+            )}
+            <p>
+              <strong>Local:</strong> {activeEvent.location}
+            </p>
+            <p>
+              <strong>Endereço:</strong> {activeEvent.address}
+            </p>
+            <p>
+              <strong>Horário:</strong> {activeEvent.time}
+            </p>
+            <p>
+              <strong>Informações:</strong> {activeEvent.info}
+            </p>
+          </div>
+        )}
       </Modal>
     </div>
   );
