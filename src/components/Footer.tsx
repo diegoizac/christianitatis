@@ -1,4 +1,5 @@
 import React from "react";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 interface FooterProps {
   setActiveModal: (modalId: string | null) => void;
@@ -7,7 +8,7 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = () => {
   return (
     <footer
-      className="footer text-black py-6 fixed bottom-0 w-full bg-white"
+      className="footer text-black py-6 fixed bottom-0 w-full"
       id="row-footer"
     >
       <div className="container mx-auto text-center">
@@ -40,7 +41,7 @@ const Footer: React.FC<FooterProps> = () => {
             <i className="fa-brands fa-instagram"></i>
           </a>
         </div>
-        <p style={{ color: "#1f2937", backgroundColor: "white" }}>
+        <p style={{ color: "#1f2937" }}>
           © 2025 All Rights Reserved. Christianitatis |
           <a
             href="https://2dlcompany.com.br"

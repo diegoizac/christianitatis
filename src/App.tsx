@@ -7,6 +7,7 @@ import LeftMenu from "./components/LeftMenu";
 import EventCarousel from "./components/EventCarousel";
 import EventCard from "./components/EventCard";
 import Animation from "./components/Animation";
+import "@fortawesome/fontawesome-free/css/all.min.css"; // Importar Font Awesome para ícones
 
 function App() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
