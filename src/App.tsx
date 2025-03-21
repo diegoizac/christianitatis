@@ -4,7 +4,6 @@ import Footer from "./components/Footer";
 import Modal from "./components/Modal";
 // import CenteredThreeScene from './components/CenteredThreeScene';
 import LeftMenu from "./components/LeftMenu";
-import EventCarousel from "./components/EventCarousel";
 import EventCard from "./components/EventCard";
 import Animation from "./components/Animation";
 import SocialIcons from "./components/SocialIcons";
@@ -24,21 +23,6 @@ function App() {
     info: string;
     videoUrl?: string;
   } | null>(null);
-
-  const featuredEvents = [
-    {
-      imageUrl: "./assets/images/banner-nick-ponta-grossa.png",
-      title: "Destaque Ponta Grossa",
-      eventPath: "/evento-pg",
-      videoUrl: "/assets/videos/video-nick-ponta-grossa.mp4",
-    },
-    {
-      imageUrl: "./assets/images/banner-nick-belem.png",
-      title: "Destaque Belém",
-      eventPath: "/evento-belem",
-      videoUrl: "/assets/videos/video-nick-belem.mp4",
-    },
-  ];
 
   const events = [
     {
@@ -217,9 +201,6 @@ function App() {
       >
         <div className="modal-content-inner">
           <h2 className="text-2xl font-bold mb-4">Próximos Eventos</h2>
-          {/* Event Carousel */}
-          <EventCarousel events={featuredEvents} />
-
           {/* Adicionar vídeos e posts específicos para cada cidade */}
           <div className="mt-6">
             <h3 className="text-xl font-semibold mb-2">Eventos por Cidade</h3>
