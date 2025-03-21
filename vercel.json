@@ -5,7 +5,7 @@
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "installCommand": "npm install --no-optional",
+        "installCommand": "npm ci --omit=optional",
         "buildCommand": "npm run build",
         "distDir": "dist"
       }
