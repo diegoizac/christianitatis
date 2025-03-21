@@ -11,18 +11,8 @@ import SocialIcons from "./components/SocialIcons";
 function App() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [activeEvent, setActiveEvent] = useState<{
-    imageUrl: string;
-    title: string;
-    location: string;
-    address: string;
-    time: string;
-    info: string;
-    videoUrl?: string;
-  } | null>(null);
 
   const events = [
     {
@@ -164,19 +154,6 @@ function App() {
     }
   };
 
-  // Modificar o EventCard para abrir o modal com detalhes
-  const handleEventClick = (event: {
-    imageUrl: string;
-    title: string;
-    location: string;
-    address: string;
-    time: string;
-    info: string;
-  }) => {
-    setActiveEvent(event);
-    setActiveModal("event-details-modal");
-  };
-
   return (
     <div className="main-container bg-gray-100 relative min-h-screen">
       <Suspense fallback={<div>Carregando...</div>}>
@@ -201,6 +178,11 @@ function App() {
       >
         <div className="modal-content-inner">
           <h2 className="text-2xl font-bold mb-4">Próximos Eventos</h2>
+          <img
+            src="/assets/images/todos-eventos.jpeg"
+            alt="Todos os eventos"
+            className="w-full h-auto object-contain mb-4"
+          />
           {/* Adicionar vídeos e posts específicos para cada cidade */}
           <div className="mt-6">
             <h3 className="text-xl font-semibold mb-2">Eventos por Cidade</h3>
@@ -241,8 +223,7 @@ function App() {
                 address={event.address}
                 time={event.time}
                 info={event.info}
-                videoUrl={event.videoUrl}
-                onClick={() => handleEventClick(event)}
+                onClick={() => {}}
               />
             ))}
           </div>
@@ -329,61 +310,6 @@ function App() {
           <h3 className="text-xl font-semibold mb-2">Social</h3>
           <SocialIcons iconSize="lg" />
         </div>
-      </Modal>
-
-      <Modal
-        id="video-modal"
-        isOpen={activeModal === "video-modal"}
-        onClose={() => {
-          setActiveModal(null);
-          setVideoUrl(null);
-        }}
-        title=""
-      >
-        <div className="modal-content-inner relative">
-          {videoUrl && (
-            <video controls autoPlay className="w-full h-auto">
-              <source src={videoUrl} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          )}
-        </div>
-      </Modal>
-
-      <Modal
-        id="event-details-modal"
-        isOpen={activeModal === "event-details-modal"}
-        onClose={() => setActiveModal(null)}
-        title={activeEvent?.title || "Detalhes do Evento"}
-      >
-        {activeEvent && (
-          <div className="modal-content-inner">
-            {activeEvent.videoUrl ? (
-              <video controls autoPlay className="w-full h-auto mb-4">
-                <source src={activeEvent.videoUrl} type="video/mp4" />
-                Seu navegador não suporta o elemento de vídeo.
-              </video>
-            ) : (
-              <img
-                src={activeEvent.imageUrl}
-                alt={activeEvent.title}
-                className="w-full h-auto object-contain mb-4"
-              />
-            )}
-            <p>
-              <strong>Local:</strong> {activeEvent.location}
-            </p>
-            <p>
-              <strong>Endereço:</strong> {activeEvent.address}
-            </p>
-            <p>
-              <strong>Horário:</strong> {activeEvent.time}
-            </p>
-            <p>
-              <strong>Informações:</strong> {activeEvent.info}
-            </p>
-          </div>
-        )}
       </Modal>
     </div>
   );
