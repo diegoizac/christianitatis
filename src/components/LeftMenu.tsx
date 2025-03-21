@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Heart, Mail } from "lucide-react";
+import { Calendar, Heart, Mail, Menu } from "lucide-react";
 
 interface LeftMenuProps {
   setActiveModal: (modalId: string | null) => void;
@@ -34,12 +34,12 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
 
   return (
     <div className="left-menu-container relative">
-      {isMobile && (
+      {isMobile && !isMenuOpen && (
         <button
           className="absolute top-4 left-4 z-50 bg-white p-2 rounded-md shadow-md"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          onClick={() => setIsMenuOpen(true)}
         >
-          Menu
+          <Menu className="h-6 w-6" />
         </button>
       )}
       {/* Menu content - always visible on desktop, toggleable on mobile */}
@@ -116,16 +116,13 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
           </li> */}
         </ul>
       </nav>
-      {/* Adicionar botão de voltar no menu lateral esquerdo para mobile */}
+      {/* Botão para fechar o menu em mobile */}
       {isMobile && isMenuOpen && (
         <button
-          className="absolute top-4 right-4 z-50 bg-white p-2 rounded-md shadow-md"
-          onClick={() => {
-            setIsMenuOpen(false);
-            handleMenuItemClick("eventos-modal");
-          }}
+          className="fixed top-4 right-4 z-50 bg-white p-2 rounded-md shadow-md"
+          onClick={() => setIsMenuOpen(false)}
         >
-          Voltar
+          X
         </button>
       )}
     </div>
