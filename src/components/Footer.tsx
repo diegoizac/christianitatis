@@ -1,5 +1,5 @@
 import React from "react";
-import "@fortawesome/fontawesome-free/css/all.min.css";
+import SocialIcons from "./SocialIcons";
 
 interface FooterProps {
   setActiveModal: (modalId: string | null) => void;
@@ -13,44 +13,17 @@ const Footer: React.FC<FooterProps> = () => {
     >
       <div className="container mx-auto text-center">
         <div className="social-icons flex justify-center space-x-6 mb-4">
-          {/* Facebook */}
-          <a
-            href="https://www.facebook.com/christianitatis"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-800 hover:text-blue-600 text-2xl animate fade-in animation-time-1s delay-08s hover:shadow-lg"
-          >
-            <i className="fa-brands fa-facebook"></i>
-          </a>
-          {/* YouTube */}
-          <a
-            href="https://www.youtube.com/@christianitatis2106"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-800 hover:text-red-600 text-2xl animate fade-in animation-time-1s delay-06s hover:shadow-lg"
-          >
-            <i className="fa-brands fa-youtube"></i>
-          </a>
-          {/* Instagram */}
-          <a
-            href="https://www.instagram.com/christianitatis"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-800 hover:text-pink-600 text-2xl animate fade-in animation-time-1s delay-06s hover:shadow-lg"
-          >
-            <i className="fa-brands fa-instagram"></i>
-          </a>
+          <SocialIcons iconSize="lg" />
         </div>
-        <p style={{ color: "#1f2937" }}>
+        <p className="text-[#1f2937] text-[0.5rem] md:text-base">
           © 2025 All Rights Reserved. Christianitatis |
           <a
             href="https://2dlcompany.com.br"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: "#1f2937" }}
+            className="text-[#1f2937]"
           >
-            Feito com <span style={{ color: "#3b82f6" }}>💙</span> por 2DL
-            Company
+            Feito com <span className="text-[#3b82f6]">💙</span> por 2DL Company
           </a>
         </p>
       </div>

@@ -329,3 +329,33 @@ body {
 .social-icons a:hover {
   transform: translateY(-5px);
 }
+
+/* Garantir que os ícones do Font Awesome sejam exibidos corretamente */
+.fa-brands {
+  display: inline-block !important;
+  font-size: 24px !important;
+  width: auto !important;
+  height: auto !important;
+  vertical-align: middle !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Comentando as regras de fallback para ícones, pois o CDN já gerencia os ícones corretamente
+.fa-facebook:before {
+  content: "\f39e";
+}
+
+.fa-youtube:before {
+  content: "\f167";
+}
+
+.fa-instagram:before {
+  content: "\f16d";
+}
+*/
+
+/* Garantir que os ícones do Font Awesome usem a fonte correta */
+.fab {
+  font-family: "Font Awesome 6 Brands" !important;
+}

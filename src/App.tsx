@@ -7,7 +7,7 @@ import LeftMenu from "./components/LeftMenu";
 import EventCarousel from "./components/EventCarousel";
 import EventCard from "./components/EventCard";
 import Animation from "./components/Animation";
-import "@fortawesome/fontawesome-free/css/all.min.css"; // Importar Font Awesome para ícones
+import SocialIcons from "./components/SocialIcons";
 
 function App() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -346,32 +346,7 @@ function App() {
           </p>
 
           <h3 className="text-xl font-semibold mb-2">Social</h3>
-          <div className="flex space-x-4">
-            <a
-              href="https://www.facebook.com/christianitatis"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800"
-            >
-              <i className="fab fa-facebook fa-lg"></i>
-            </a>
-            <a
-              href="https://www.youtube.com/@christianitatis2106"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-red-600 hover:text-red-800"
-            >
-              <i className="fab fa-youtube fa-lg"></i>
-            </a>
-            <a
-              href="https://www.instagram.com/christianitatis"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-pink-600 hover:text-pink-800"
-            >
-              <i className="fab fa-instagram fa-lg"></i>
-            </a>
-          </div>
+          <SocialIcons iconSize="lg" />
         </div>
       </Modal>
 
