@@ -5,7 +5,12 @@ import { viteStaticCopy } from "vite-plugin-static-copy";
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "/",
-  logLevel: "error",
+  server: {
+    port: 3000,
+    host: true,
+    open: true, // Abre o navegador automaticamente
+  },
+  logLevel: "info", // Mudando para info para ver mais detalhes
   plugins: [
     react(),
     viteStaticCopy({
