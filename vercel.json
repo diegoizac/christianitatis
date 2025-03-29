@@ -4,11 +4,27 @@
     {
       "src": "package.json",
       "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist",
-        "buildCommand": "npm run build"
-      }
+      "config": { "distDir": "dist" }
+    },
+    {
+      "src": "api/**/*.ts",
+      "use": "@vercel/node"
     }
   ],
-  "routes": [{ "src": "/(.*)", "dest": "/index.html" }]
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_SUPABASE_URL": "@vite_supabase_url",
+    "VITE_SUPABASE_ANON_KEY": "@vite_supabase_anon_key",
+    "VITE_SUPABASE_SERVICE_ROLE_KEY": "@vite_supabase_service_role_key",
+    "SENDGRID_API_KEY": "@sendgrid_api_key"
+  }
 }
