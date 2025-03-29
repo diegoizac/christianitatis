@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import { VitePWA } from "vite-plugin-pwa";
+import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -34,6 +36,31 @@ export default defineConfig({
         },
       ],
     }),
+    VitePWA({
+      registerType: "autoUpdate",
+      includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
+      manifest: {
+        name: "Christianitatis",
+        short_name: "Christianitatis",
+        description: "Plataforma de eventos cristãos",
+        theme_color: "#ffffff",
+        icons: [
+          {
+            src: "pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+      },
+    }),
+    visualizer({
+      filename: "./dist/stats.html",
+    }),
   ],
   optimizeDeps: {
     exclude: ["lucide-react"],
@@ -41,13 +68,23 @@ export default defineConfig({
   build: {
     outDir: "dist",
     sourcemap: true,
-    chunkSizeWarningLimit: 1500,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       onwarn(warning, warn) {
         if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
           return;
         }
         warn(warning);
+      },
+      output: {
+        manualChunks: {
+          "react-vendor": ["react", "react-dom"],
+          "ui-vendor": [
+            "@fortawesome/fontawesome-svg-core",
+            "@fortawesome/react-fontawesome",
+          ],
+          "three-vendor": ["three", "@react-three/fiber", "@react-three/drei"],
+        },
       },
     },
   },
