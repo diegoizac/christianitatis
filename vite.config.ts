@@ -8,7 +8,12 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
+    strictPort: false,
     open: true, // Abre o navegador automaticamente
+  },
+  preview: {
+    port: 3000,
+    strictPort: false,
   },
   logLevel: "info", // Mudando para info para ver mais detalhes
   plugins: [
@@ -16,6 +21,7 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         { src: "src/assets/images/*", dest: "assets/images" },
+        { src: "src/assets/videos/*", dest: "assets/videos" },
         { src: "src/assets/animations/*", dest: "assets/animations" },
       ],
     }),
@@ -24,13 +30,16 @@ export default defineConfig({
     exclude: ["lucide-react"],
   },
   build: {
+    outDir: "dist",
+    sourcemap: true,
+    chunkSizeWarningLimit: 1500,
     rollupOptions: {
       onwarn(warning, warn) {
-        if (warning.code === "EVAL") return;
-        if (warning.code === "CHUNK_SIZE_WARNING") return;
+        if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
+          return;
+        }
         warn(warning);
       },
     },
-    chunkSizeWarningLimit: 1500,
   },
 });
