@@ -20,9 +20,18 @@ export default defineConfig({
     react(),
     viteStaticCopy({
       targets: [
-        { src: "src/assets/images/*", dest: "assets/images" },
-        { src: "src/assets/videos/*", dest: "assets/videos" },
-        { src: "src/assets/animations/*", dest: "assets/animations" },
+        {
+          src: "src/assets/images/*",
+          dest: "assets/images",
+        },
+        {
+          src: "src/assets/videos/*",
+          dest: "assets/videos",
+        },
+        {
+          src: "src/assets/animations/*",
+          dest: "assets/animations",
+        },
       ],
     }),
   ],
@@ -41,5 +50,8 @@ export default defineConfig({
         warn(warning);
       },
     },
+  },
+  css: {
+    postcss: "./postcss.config.js",
   },
 });

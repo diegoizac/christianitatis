@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Seus estilos customizados aqui */
+
 :root {
   --primary-color: #3b82f6; /* Example, adjust as needed */
   /* Jeton-inspired colors */
