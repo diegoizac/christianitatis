@@ -7,6 +7,10 @@ import LeftMenu from "./components/LeftMenu";
 import EventCard from "./components/EventCard";
 import Animation from "./components/Animation";
 import SocialIcons from "./components/SocialIcons";
+import ContactForm from "./components/ContactForm";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -154,8 +158,18 @@ function App() {
     }
   };
 
+  const handleFormSuccess = () => {
+    toast.success("Mensagem enviada com sucesso!");
+    setActiveModal(null);
+  };
+
+  const handleFormError = (error: string) => {
+    toast.error(error);
+  };
+
   return (
     <div className="main-container bg-gray-100 relative min-h-screen">
+      <ToastContainer position="top-right" autoClose={5000} />
       <Suspense fallback={<div>Carregando...</div>}>
         <Header isScrolled={isScrolled} setActiveModal={setActiveModal} />
         <main className="flex flex-grow pt-16">
@@ -177,53 +191,31 @@ function App() {
         title="Eventos"
       >
         <div className="modal-content-inner">
-          <h2 className="text-2xl font-bold mb-4">Próximos Eventos</h2>
-          <img
-            src="/assets/images/todos-eventos.jpeg"
-            alt="Todos os eventos"
-            className="w-full h-auto object-contain mb-4"
-          />
-          {/* Adicionar vídeos e posts específicos para cada cidade */}
-          <div className="mt-6">
-            <h3 className="text-xl font-semibold mb-2">Eventos por Cidade</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {cityEvents.map(
-                (
-                  cityEvent: { city: string; videoUrl: string; post: string },
-                  index: number
-                ) => (
-                  <div
-                    key={index}
-                    className="bg-white p-4 rounded-lg shadow-md"
-                  >
-                    <h4 className="text-lg font-bold mb-2">{cityEvent.city}</h4>
-                    <video controls className="w-full mb-2">
-                      <source src={cityEvent.videoUrl} type="video/mp4" />
-                      Seu navegador não suporta o elemento de vídeo.
-                    </video>
-                    <p>{cityEvent.post}</p>
-                  </div>
-                )
-              )}
-            </div>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+            Próximos Eventos
+          </h2>
+
+          {/* Banner principal */}
+          <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
+            <img
+              src="/assets/images/todos-eventos.jpeg"
+              alt="Todos os eventos"
+              className="w-full h-auto object-cover"
+            />
           </div>
 
-          <p className="mt-6">
-            Aqui você encontra informações sobre os próximos eventos da
-            Christianitatis.
-          </p>
-          {/* Event List */}
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Grid de eventos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event, index) => (
               <EventCard
                 key={index}
-                imageUrl={event.imageUrl}
-                title={event.title}
-                location={event.location}
-                address={event.address}
-                time={event.time}
-                info={event.info}
-                onClick={() => {}}
+                {...event}
+                onClick={() => {
+                  if (event.videoUrl) {
+                    // Lógica para abrir o vídeo
+                    window.open(event.videoUrl, "_blank");
+                  }
+                }}
               />
             ))}
           </div>
@@ -271,45 +263,7 @@ function App() {
         onClose={() => setActiveModal(null)}
         title="Contato"
       >
-        <div className="modal-content-inner">
-          <h2 className="text-2xl font-bold mb-4">Entre em Contato</h2>
-          <p className="mb-4">
-            Tem dúvidas, sugestões ou quer saber mais sobre a Christianitatis?
-            Entre em contato conosco!
-          </p>
-          <form className="mb-6" onSubmit={handleContactFormSubmit}>
-            <input type="text" placeholder="Seu Nome" className="form-input" />
-            <input
-              type="email"
-              placeholder="Seu E-mail"
-              className="form-input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-            <input
-              type="text"
-              placeholder="Assunto da Mensagem"
-              className="form-input"
-            />
-            <textarea
-              placeholder="Sua Mensagem"
-              className="form-input"
-            ></textarea>
-            <button type="submit" className="btn btn-primary">
-              Enviar
-            </button>
-          </form>
-          <h3 className="text-xl font-semibold mb-2">Contatos</h3>
-          <p className="mb-4">
-            <a href="mailto:info@christianitatis.org">
-              info@christianitatis.org
-            </a>
-          </p>
-
-          <h3 className="text-xl font-semibold mb-2">Social</h3>
-          <SocialIcons iconSize="lg" />
-        </div>
+        <ContactForm onSuccess={handleFormSuccess} onError={handleFormError} />
       </Modal>
     </div>
   );
