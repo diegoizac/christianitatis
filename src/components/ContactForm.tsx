@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { contactService, ContactFormData } from "../services/api";
+import { useDebounce } from "../hooks/useDebounce";
 
 interface ContactFormProps {
   onSuccess?: () => void;
@@ -16,6 +17,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError }) => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const debouncedFormData = useDebounce(formData, 500);
+
+  useEffect(() => {
+    validateForm();
+  }, [debouncedFormData]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -85,12 +92,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError }) => {
       ...prev,
       [name]: value,
     }));
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
   };
 
   const formatPhone = (value: string) => {
