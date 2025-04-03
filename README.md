@@ -1,5 +1,49 @@
 # Christianitatis
 
+Aplicação web para a comunidade Christianitatis, desenvolvida com React, Vite, TypeScript e Supabase.
+
+## 🚀 Início Rápido
+
+1. Clone o repositório
+2. Instale as dependências: `npm install`
+3. Inicie o servidor de desenvolvimento: `npm run dev`
+
+## 📚 Documentação
+
+- [Guia de Configuração e Deploy](./SETUP.md) - Instruções detalhadas para configuração do ambiente e deploy
+- [Diretrizes de Desenvolvimento](./DEVELOPMENT.md) - Padrões, boas práticas e workflow no Cursor
+- [Documentação da API](./docs/API.md) - Documentação das APIs e endpoints
+- [Guia de Contribuição](./CONTRIBUTING.md) - Como contribuir com o projeto
+
+## 🛠 Stack Tecnológica
+
+- React 18
+- Vite
+- TypeScript
+- Supabase
+- TailwindCSS
+- Three.js
+- i18next
+- Vitest
+
+## 🔧 Scripts Disponíveis
+
+- `npm run dev` - Inicia o servidor de desenvolvimento
+- `npm run build` - Gera build de produção
+- `npm run preview` - Visualiza build local
+- `npm run test` - Executa testes
+- `npm run lint` - Verifica código com ESLint
+- `npm run lint:fix` - Corrige problemas de linting
+
+## 🌐 Ambientes
+
+- Desenvolvimento: [dev.christianitatis.app](https://dev.christianitatis.app)
+- Produção: [christianitatis.app](https://christianitatis.app)
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
 ## 🌟 Sobre o Projeto
 
 Christianitatis é uma aplicação web moderna desenvolvida com React, TypeScript e Vite, focada em fornecer uma plataforma para eventos cristãos e interação com a comunidade.
@@ -132,14 +176,6 @@ O projeto é totalmente responsivo e testado nos seguintes dispositivos:
 3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
-
-## 📝 Licença
-
-Este projeto está sob a licença MIT.
-
-## 👥 Autores
-
-- Diego Izac - Desenvolvedor Principal
 
 ## 📞 Suporte
 

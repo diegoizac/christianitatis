@@ -1,15 +1,15 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { viteStaticCopy } from "vite-plugin-static-copy";
-import { VitePWA } from "vite-plugin-pwa";
-import { visualizer } from "rollup-plugin-visualizer";
-import { configDefaults } from "vitest/config";
-import viteCompression from "vite-plugin-compression";
-import viteImagemin from "vite-plugin-imagemin";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
+import { VitePWA } from 'vite-plugin-pwa'
+import { visualizer } from 'rollup-plugin-visualizer'
+import { configDefaults } from 'vitest/config'
+import viteCompression from 'vite-plugin-compression'
+import viteImagemin from 'vite-plugin-imagemin'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/",
+  base: '/',
   server: {
     port: 3000,
     host: true,
@@ -20,57 +20,13 @@ export default defineConfig({
     port: 3000,
     strictPort: false,
   },
-  logLevel: "info", // Mudando para info para ver mais detalhes
+  logLevel: 'info', // Mudando para info para ver mais detalhes
   plugins: [
     react(),
-    viteStaticCopy({
-      targets: [
-        {
-          src: "src/assets/images/*",
-          dest: "assets/images",
-        },
-        {
-          src: "src/assets/videos/*",
-          dest: "assets/videos",
-        },
-        {
-          src: "src/assets/animations/*",
-          dest: "assets/animations",
-        },
-      ],
-    }),
-    VitePWA({
-      registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
-      manifest: {
-        name: "Christianitatis",
-        short_name: "Christianitatis",
-        description: "Plataforma de eventos cristãos",
-        theme_color: "#ffffff",
-        icons: [
-          {
-            src: "pwa-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-          },
-          {
-            src: "pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-          },
-        ],
-      },
-    }),
-    visualizer({
-      filename: "./dist/stats.html",
-    }),
     viteCompression({
-      algorithm: "brotliCompress",
-      threshold: 1024,
-    }),
-    viteCompression({
-      algorithm: "gzip",
-      threshold: 1024,
+      verbose: true,
+      algorithm: 'gzip',
+      ext: '.gz',
     }),
     viteImagemin({
       gifsicle: {
@@ -81,7 +37,7 @@ export default defineConfig({
         optimizationLevel: 7,
       },
       mozjpeg: {
-        quality: 80,
+        quality: 20,
       },
       pngquant: {
         quality: [0.8, 0.9],
@@ -90,25 +46,76 @@ export default defineConfig({
       svgo: {
         plugins: [
           {
-            name: "removeViewBox",
+            name: 'removeViewBox',
           },
           {
-            name: "removeEmptyAttrs",
+            name: 'removeEmptyAttrs',
             active: false,
           },
         ],
       },
     }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      manifest: {
+        name: 'Christianitatis',
+        short_name: 'Christianitatis',
+        description: 'Aplicação web para a comunidade Christianitatis',
+        theme_color: '#ffffff',
+        icons: [
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable',
+          },
+        ],
+      },
+    }),
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'src/assets/images/*',
+          dest: 'assets/images',
+        },
+        {
+          src: 'src/assets/videos/*',
+          dest: 'assets/videos',
+        },
+        {
+          src: 'src/assets/animations/*',
+          dest: 'assets/animations',
+        },
+      ],
+    }),
+    visualizer({
+      template: 'treemap',
+      open: true,
+      gzipSize: true,
+      brotliSize: true,
+      filename: 'dist/stats.html',
+    }),
   ],
   optimizeDeps: {
-    include: ["framer-motion"],
-    exclude: ["lucide-react"],
+    include: ['framer-motion'],
+    exclude: ['lucide-react'],
   },
   build: {
-    outDir: "dist",
+    outDir: 'dist',
     sourcemap: true,
     chunkSizeWarningLimit: 1000,
-    minify: "terser",
+    minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true,
@@ -116,39 +123,25 @@ export default defineConfig({
       },
     },
     rollupOptions: {
-      onwarn(warning, warn) {
-        if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
-          return;
-        }
-        warn(warning);
-      },
-      output: {
-        manualChunks: {
-          "react-vendor": ["react", "react-dom"],
-          "ui-vendor": [
-            "@fortawesome/fontawesome-svg-core",
-            "@fortawesome/react-fontawesome",
-          ],
-          "three-vendor": ["three", "@react-three/fiber", "@react-three/drei"],
-        },
-      },
+      context: 'globalThis',
+      experimentalLogSideEffects: true,
     },
   },
   css: {
-    postcss: "./postcss.config.js",
+    postcss: './postcss.config.js',
   },
   test: {
     globals: true,
-    environment: "jsdom",
-    setupFiles: ["./src/tests/setup.ts"],
+    environment: 'jsdom',
+    setupFiles: ['./src/tests/setup.ts'],
     coverage: {
-      provider: "v8",
-      reporter: ["text", "json", "html"],
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
       exclude: [
         ...configDefaults.coverage.exclude,
-        "src/tests/setup.ts",
-        "src/main.tsx",
-        "src/vite-env.d.ts",
+        'src/tests/setup.ts',
+        'src/main.tsx',
+        'src/vite-env.d.ts',
       ],
       thresholds: {
         statements: 80,
@@ -158,4 +151,4 @@ export default defineConfig({
       },
     },
   },
-});
+})

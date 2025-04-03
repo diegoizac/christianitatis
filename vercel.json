@@ -1,15 +1,9 @@
 {
-  "version": 2,
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
-  "outputDirectory": "dist",
   "framework": "vite",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
+  "outputDirectory": "dist",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "headers": [
     {
       "source": "/(.*)",
@@ -28,19 +22,9 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.supabase.co; media-src 'self' blob:; frame-src 'self';"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.unsplash.com https://*.supabase.co; font-src 'self' data:; connect-src 'self' https://*.vercel-analytics.com https://*.supabase.co;"
         }
       ]
     }
-  ],
-  "env": {
-    "VITE_SUPABASE_URL": "@vite_supabase_url",
-    "VITE_SUPABASE_ANON_KEY": "@vite_supabase_anon_key"
-  },
-  "build": {
-    "env": {
-      "VITE_SUPABASE_URL": "@vite_supabase_url",
-      "VITE_SUPABASE_ANON_KEY": "@vite_supabase_anon_key"
-    }
-  }
+  ]
 }

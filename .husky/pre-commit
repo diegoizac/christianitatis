@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Executa o script de verificação de arquivos
+./scripts/check-files.sh
+
+# Se houver erro, impede o commit
+if [ $? -ne 0 ]; then
+  echo "❌ Por favor, salve todos os arquivos antes de fazer commit"
+  exit 1
+fi
+
+# Executa o lint-staged
+exec >/dev/tty 2>&1
+npx lint-staged 
