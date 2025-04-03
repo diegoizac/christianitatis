@@ -3,14 +3,7 @@ name: Setup Branch Protection
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
-  repository-projects: write
-  security-events: write
-  statuses: write
-  actions: write
-  administration: write
+permissions: write-all
 
 jobs:
   setup-protection:
