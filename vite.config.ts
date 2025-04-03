@@ -6,7 +6,7 @@ import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/",
+  base: "./",
   server: {
     port: 3000,
     host: true,
@@ -19,7 +19,10 @@ export default defineConfig({
   },
   logLevel: "info", // Mudando para info para ver mais detalhes
   plugins: [
-    react(),
+    react({
+      jsxRuntime: "automatic",
+      fastRefresh: true,
+    }),
     viteStaticCopy({
       targets: [
         {
@@ -63,6 +66,7 @@ export default defineConfig({
     }),
   ],
   optimizeDeps: {
+    include: ["react", "react-dom", "react-router-dom"],
     exclude: ["lucide-react"],
   },
   build: {
@@ -78,7 +82,7 @@ export default defineConfig({
       },
       output: {
         manualChunks: {
-          "react-vendor": ["react", "react-dom"],
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
           "ui-vendor": [
             "@fortawesome/fontawesome-svg-core",
             "@fortawesome/react-fontawesome",
@@ -90,5 +94,10 @@ export default defineConfig({
   },
   css: {
     postcss: "./postcss.config.js",
+  },
+  resolve: {
+    alias: {
+      "@": "/src",
+    },
   },
 });

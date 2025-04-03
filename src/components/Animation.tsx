@@ -2,10 +2,21 @@ import React from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 
+// Mock para testes
+if (process.env.NODE_ENV === "test") {
+  useGLTF.preload = () => {};
+}
+
 const Animation = ({ style }: { style?: React.CSSProperties }) => {
   const { scene } = useGLTF(
-    "./assets/animations/logo-3d-christianitatisv002.glb"
+    process.env.NODE_ENV === "test"
+      ? "/mock.glb"
+      : new URL(
+          "../assets/animations/logo-3d-christianitatisv002.glb",
+          import.meta.url
+        ).href
   );
+
   return (
     <Canvas style={{ height: "100vh", width: "100%", ...style }}>
       <ambientLight intensity={0.5} />

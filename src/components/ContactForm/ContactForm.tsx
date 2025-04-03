@@ -1,10 +1,14 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useFormValidation } from "../../hooks/useFormValidation";
 import { ContactFormProps, ContactFormData } from "../../types/forms";
 
-export default function ContactForm({ onSubmit, onSuccess, onError }: ContactFormProps) {
+export default function ContactForm({
+  onSubmit,
+  onSuccess,
+  onError,
+}: ContactFormProps) {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -45,7 +49,8 @@ export default function ContactForm({ onSubmit, onSuccess, onError }: ContactFor
       }, 5000);
     } catch (error) {
       console.error("Erro ao enviar formulário:", error);
-      const errorMessage = error instanceof Error ? error.message : t("form.errors.submitError");
+      const errorMessage =
+        error instanceof Error ? error.message : t("form.errors.submitError");
       setErrors((prev) => ({
         ...prev,
         submit: errorMessage,
@@ -57,7 +62,9 @@ export default function ContactForm({ onSubmit, onSuccess, onError }: ContactFor
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -150,7 +157,11 @@ export default function ContactForm({ onSubmit, onSuccess, onError }: ContactFor
           aria-describedby={errors.email ? "email-error" : undefined}
         />
         {errors.email && (
-          <p id="email-error" className="mt-1 text-sm text-red-600" role="alert">
+          <p
+            id="email-error"
+            className="mt-1 text-sm text-red-600"
+            role="alert"
+          >
             {errors.email}
           </p>
         )}
@@ -183,7 +194,11 @@ export default function ContactForm({ onSubmit, onSuccess, onError }: ContactFor
           aria-describedby={errors.phone ? "phone-error" : undefined}
         />
         {errors.phone && (
-          <p id="phone-error" className="mt-1 text-sm text-red-600" role="alert">
+          <p
+            id="phone-error"
+            className="mt-1 text-sm text-red-600"
+            role="alert"
+          >
             {errors.phone}
           </p>
         )}

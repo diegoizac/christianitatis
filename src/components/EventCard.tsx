@@ -8,7 +8,7 @@ interface EventCardProps {
   time: string;
   info: string;
   videoUrl?: string; // Optional video URL
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -21,6 +21,17 @@ const EventCard: React.FC<EventCardProps> = ({
   videoUrl,
   onClick,
 }) => {
+  // Função para normalizar os caminhos das imagens e vídeos
+  const normalizePath = (path: string) => {
+    if (path.startsWith("./")) {
+      return path.substring(2);
+    }
+    if (path.startsWith("/")) {
+      return path.substring(1);
+    }
+    return path;
+  };
+
   return (
     <div
       className="relative group bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 cursor-pointer"
@@ -29,7 +40,7 @@ const EventCard: React.FC<EventCardProps> = ({
       {/* Imagem do Evento */}
       <div className="relative h-48 overflow-hidden">
         <img
-          src={imageUrl}
+          src={normalizePath(imageUrl)}
           alt={title}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
         />

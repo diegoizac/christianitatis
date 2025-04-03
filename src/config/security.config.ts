@@ -36,7 +36,7 @@ export const securityConfig: SecurityConfig = {
     message: "Muitas requisições deste IP, tente novamente mais tarde",
   },
   sanitization: {
-    allowedTags: ["b", "i", "em", "strong", "a"],
+    allowedTags: ["p", "b", "i", "em", "strong", "a"],
     allowedAttributes: {
       a: ["href", "target"],
     },

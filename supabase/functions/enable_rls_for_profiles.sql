@@ -1,0 +1,6 @@
+CREATE OR REPLACE FUNCTION enable_rls_for_profiles()
+RETURNS void AS $$
+BEGIN
+    ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER; 

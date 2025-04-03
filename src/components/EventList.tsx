@@ -1,5 +1,6 @@
-import React from 'react';
-import EventCard from './EventCard';
+import React from "react";
+import EventCard from "./EventCard";
+import { useNavigate } from "react-router-dom";
 
 interface Event {
   imageUrl: string;
@@ -18,6 +19,8 @@ interface EventListProps {
 }
 
 const EventList: React.FC<EventListProps> = ({ events, loading, error }) => {
+  const navigate = useNavigate();
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
@@ -42,11 +45,31 @@ const EventList: React.FC<EventListProps> = ({ events, loading, error }) => {
     );
   }
 
+  // Função para gerar um ID único baseado no título do evento
+  const generateEventId = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  };
+
+  // Função para navegar para a página do evento
+  const handleEventClick = (event: Event) => {
+    const eventId = generateEventId(event.title);
+    navigate(`/evento/${eventId}`, { state: { event } });
+  };
+
+  // Remover duplicatas baseado no título do evento
+  const uniqueEvents = events.filter(
+    (event, index, self) =>
+      index === self.findIndex((e) => e.title === event.title)
+  );
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-      {events.map((event, index) => (
+      {uniqueEvents.map((event) => (
         <EventCard
-          key={`${event.title}-${index}`}
+          key={generateEventId(event.title)}
           imageUrl={event.imageUrl}
           title={event.title}
           location={event.location}
@@ -54,6 +77,7 @@ const EventList: React.FC<EventListProps> = ({ events, loading, error }) => {
           time={event.time}
           info={event.info}
           videoUrl={event.videoUrl}
+          onClick={() => handleEventClick(event)}
         />
       ))}
     </div>

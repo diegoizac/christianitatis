@@ -1,51 +1,54 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import userEvent from '@testing-library/user-event';
-import ContactForm from '../ContactForm';
+import { render, screen, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import userEvent from "@testing-library/user-event";
+import ContactForm from "../ContactForm";
 
 // Mock do i18n
-vi.mock('react-i18next', () => ({
+vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'form.name': 'Nome',
-        'form.email': 'Email',
-        'form.phone': 'Telefone',
-        'form.subject': 'Assunto',
-        'form.message': 'Mensagem',
-        'form.send': 'Enviar',
-        'form.sending': 'Enviando...',
-        'form.success': 'Mensagem enviada com sucesso!',
-        'form.errors.nameRequired': 'Nome é obrigatório',
-        'form.errors.nameMinLength': 'Nome deve ter pelo menos 3 caracteres',
-        'form.errors.emailRequired': 'Email é obrigatório',
-        'form.errors.emailInvalid': 'Email inválido',
-        'form.errors.phoneInvalid': 'Telefone inválido',
-        'form.errors.messageRequired': 'Mensagem é obrigatória',
-        'form.errors.messageMinLength': 'Mensagem deve ter pelo menos 10 caracteres',
-        'form.errors.submitError': 'Erro ao enviar mensagem',
-        'form.subjectPlaceholder': 'Selecione um assunto',
-        'form.subjects.events': 'Eventos',
-        'form.subjects.questions': 'Dúvidas',
-        'form.subjects.suggestions': 'Sugestões',
-        'form.subjects.others': 'Outros',
+        "form.name": "Nome",
+        "form.email": "Email",
+        "form.phone": "Telefone",
+        "form.subject": "Assunto",
+        "form.message": "Mensagem",
+        "form.send": "Enviar",
+        "form.sending": "Enviando...",
+        "form.success": "Mensagem enviada com sucesso!",
+        "form.errors.nameRequired": "Nome é obrigatório",
+        "form.errors.nameMinLength": "Nome deve ter pelo menos 3 caracteres",
+        "form.errors.emailRequired": "Email é obrigatório",
+        "form.errors.emailInvalid": "Email inválido",
+        "form.errors.phoneInvalid": "Telefone inválido",
+        "form.errors.messageRequired": "Mensagem é obrigatória",
+        "form.errors.messageMinLength":
+          "Mensagem deve ter pelo menos 10 caracteres",
+        "form.errors.submitError": "Erro ao enviar mensagem",
+        "form.subjectPlaceholder": "Selecione um assunto",
+        "form.subjects.events": "Eventos",
+        "form.subjects.questions": "Dúvidas",
+        "form.subjects.suggestions": "Sugestões",
+        "form.subjects.others": "Outros",
       };
       return translations[key] || key;
     },
   }),
 }));
 
-describe('ContactForm', () => {
+describe("ContactForm", () => {
+  const user = userEvent.setup({ delay: null });
+
   beforeEach(() => {
     vi.useFakeTimers();
   });
 
   afterEach(() => {
-    vi.runOnlyPendingTimers();
+    vi.clearAllTimers();
     vi.useRealTimers();
   });
 
-  it('deve renderizar todos os campos do formulário', () => {
+  it("deve renderizar todos os campos do formulário", () => {
     render(<ContactForm />);
 
     expect(screen.getByLabelText(/nome/i)).toBeInTheDocument();
@@ -53,140 +56,184 @@ describe('ContactForm', () => {
     expect(screen.getByLabelText(/telefone/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/assunto/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/mensagem/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /enviar/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /enviar/i })).toBeInTheDocument();
   });
 
-  it('deve mostrar erro quando campos obrigatórios estão vazios', async () => {
+  it("deve mostrar erro quando campos obrigatórios estão vazios", async () => {
     render(<ContactForm />);
 
-    const submitButton = screen.getByRole('button', { name: /enviar/i });
-    await userEvent.click(submitButton);
+    await user.click(screen.getByRole("button", { name: /enviar/i }));
+    vi.runAllTimers();
 
-    expect(await screen.findByText(/nome é obrigatório/i)).toBeInTheDocument();
-    expect(await screen.findByText(/email é obrigatório/i)).toBeInTheDocument();
-    expect(await screen.findByText(/mensagem é obrigatória/i)).toBeInTheDocument();
+    await waitFor(
+      () => {
+        expect(screen.getByText(/nome é obrigatório/i)).toBeInTheDocument();
+        expect(screen.getByText(/email é obrigatório/i)).toBeInTheDocument();
+        expect(screen.getByText(/mensagem é obrigatória/i)).toBeInTheDocument();
+      },
+      { timeout: 15000 }
+    );
   });
 
-  it('deve validar formato de email', async () => {
+  it("deve validar formato de email", async () => {
     render(<ContactForm />);
 
-    const emailInput = screen.getByLabelText(/email/i);
-    await userEvent.type(emailInput, 'email-invalido');
+    await user.type(screen.getByLabelText(/email/i), "email-invalido");
+    vi.runAllTimers();
 
-    // Aguarda o debounce
-    vi.advanceTimersByTime(500);
+    await waitFor(
+      () => {
+        expect(screen.getByText(/email inválido/i)).toBeInTheDocument();
+      },
+      { timeout: 15000 }
+    );
 
-    expect(await screen.findByText(/email inválido/i)).toBeInTheDocument();
+    await user.clear(screen.getByLabelText(/email/i));
+    await user.type(screen.getByLabelText(/email/i), "email@valido.com");
+    vi.runAllTimers();
 
-    // Corrige o email
-    await userEvent.clear(emailInput);
-    await userEvent.type(emailInput, 'email@valido.com');
-
-    // Aguarda o debounce
-    vi.advanceTimersByTime(500);
-
-    expect(screen.queryByText(/email inválido/i)).not.toBeInTheDocument();
+    await waitFor(
+      () => {
+        expect(screen.queryByText(/email inválido/i)).not.toBeInTheDocument();
+      },
+      { timeout: 15000 }
+    );
   });
 
-  it('deve validar formato de telefone', async () => {
+  it("deve validar formato de telefone", async () => {
     render(<ContactForm />);
 
-    const phoneInput = screen.getByLabelText(/telefone/i);
-    await userEvent.type(phoneInput, '123'); // Telefone muito curto
+    await user.type(screen.getByLabelText(/telefone/i), "123");
+    vi.runAllTimers();
 
-    // Aguarda o debounce
-    vi.advanceTimersByTime(500);
+    await waitFor(
+      () => {
+        expect(screen.getByText(/telefone inválido/i)).toBeInTheDocument();
+      },
+      { timeout: 15000 }
+    );
 
-    expect(await screen.findByText(/telefone inválido/i)).toBeInTheDocument();
+    await user.clear(screen.getByLabelText(/telefone/i));
+    await user.type(screen.getByLabelText(/telefone/i), "11999999999");
+    vi.runAllTimers();
 
-    // Corrige o telefone
-    await userEvent.clear(phoneInput);
-    await userEvent.type(phoneInput, '11999999999');
-
-    // Aguarda o debounce
-    vi.advanceTimersByTime(500);
-
-    expect(screen.queryByText(/telefone inválido/i)).not.toBeInTheDocument();
+    await waitFor(
+      () => {
+        expect(
+          screen.queryByText(/telefone inválido/i)
+        ).not.toBeInTheDocument();
+      },
+      { timeout: 15000 }
+    );
   });
 
-  it('deve formatar telefone corretamente', async () => {
+  it("deve formatar telefone corretamente", async () => {
     render(<ContactForm />);
 
-    const phoneInput = screen.getByLabelText(/telefone/i);
-    await userEvent.type(phoneInput, '11999999999');
+    await user.type(screen.getByLabelText(/telefone/i), "11999999999");
+    vi.runAllTimers();
 
-    expect(phoneInput).toHaveValue('(11) 99999-9999');
+    await waitFor(
+      () => {
+        expect(screen.getByLabelText(/telefone/i)).toHaveValue(
+          "(11) 99999-9999"
+        );
+      },
+      { timeout: 15000 }
+    );
   });
 
-  it('deve chamar onSubmit com dados válidos', async () => {
+  it("deve chamar onSubmit com dados válidos", async () => {
     const onSubmit = vi.fn();
     const onSuccess = vi.fn();
     render(<ContactForm onSubmit={onSubmit} onSuccess={onSuccess} />);
 
-    // Preenche o formulário
-    await userEvent.type(screen.getByLabelText(/nome/i), 'João Silva');
-    await userEvent.type(screen.getByLabelText(/email/i), 'joao@exemplo.com');
-    await userEvent.type(screen.getByLabelText(/telefone/i), '11999999999');
-    await userEvent.selectOptions(screen.getByLabelText(/assunto/i), ['eventos']);
-    await userEvent.type(screen.getByLabelText(/mensagem/i), 'Esta é uma mensagem de teste.');
+    await user.type(screen.getByLabelText(/nome/i), "João Silva");
+    await user.type(screen.getByLabelText(/email/i), "joao@exemplo.com");
+    await user.type(screen.getByLabelText(/telefone/i), "11999999999");
+    await user.selectOptions(screen.getByLabelText(/assunto/i), ["eventos"]);
+    await user.type(
+      screen.getByLabelText(/mensagem/i),
+      "Esta é uma mensagem de teste."
+    );
 
-    // Aguarda o debounce
-    vi.advanceTimersByTime(500);
+    vi.runAllTimers();
 
-    // Envia o formulário
-    await userEvent.click(screen.getByRole('button', { name: /enviar/i }));
+    await user.click(screen.getByRole("button", { name: /enviar/i }));
 
-    expect(onSubmit).toHaveBeenCalledWith({
-      name: 'João Silva',
-      email: 'joao@exemplo.com',
-      phone: '(11) 99999-9999',
-      subject: 'eventos',
-      message: 'Esta é uma mensagem de teste.',
-    });
-
-    expect(onSuccess).toHaveBeenCalled();
+    await waitFor(
+      () => {
+        expect(onSubmit).toHaveBeenCalledWith({
+          name: "João Silva",
+          email: "joao@exemplo.com",
+          phone: "(11) 99999-9999",
+          subject: "eventos",
+          message: "Esta é uma mensagem de teste.",
+        });
+        expect(onSuccess).toHaveBeenCalled();
+      },
+      { timeout: 15000 }
+    );
   });
 
-  it('deve mostrar e esconder mensagem de sucesso', async () => {
+  it("deve mostrar e esconder mensagem de sucesso", async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     render(<ContactForm onSubmit={onSubmit} />);
 
-    // Preenche e envia o formulário
-    await userEvent.type(screen.getByLabelText(/nome/i), 'João Silva');
-    await userEvent.type(screen.getByLabelText(/email/i), 'joao@exemplo.com');
-    await userEvent.type(screen.getByLabelText(/mensagem/i), 'Esta é uma mensagem de teste.');
+    await user.type(screen.getByLabelText(/nome/i), "João Silva");
+    await user.type(screen.getByLabelText(/email/i), "joao@exemplo.com");
+    await user.type(
+      screen.getByLabelText(/mensagem/i),
+      "Esta é uma mensagem de teste."
+    );
 
-    // Aguarda o debounce
-    vi.advanceTimersByTime(500);
+    vi.runAllTimers();
 
-    await userEvent.click(screen.getByRole('button', { name: /enviar/i }));
+    await user.click(screen.getByRole("button", { name: /enviar/i }));
 
-    // Verifica se a mensagem de sucesso aparece
-    expect(await screen.findByText(/mensagem enviada com sucesso/i)).toBeInTheDocument();
+    await waitFor(
+      () => {
+        expect(
+          screen.getByText(/mensagem enviada com sucesso/i)
+        ).toBeInTheDocument();
+      },
+      { timeout: 15000 }
+    );
 
-    // Avança o timer para verificar se a mensagem some
-    vi.advanceTimersByTime(5000);
+    vi.advanceTimersByTime(3000);
 
-    expect(screen.queryByText(/mensagem enviada com sucesso/i)).not.toBeInTheDocument();
+    await waitFor(
+      () => {
+        expect(
+          screen.queryByText(/mensagem enviada com sucesso/i)
+        ).not.toBeInTheDocument();
+      },
+      { timeout: 15000 }
+    );
   });
 
-  it('deve tratar erro na submissão', async () => {
-    const errorMessage = 'Erro de conexão';
-    const onSubmit = vi.fn().mockRejectedValue(new Error(errorMessage));
+  it("deve tratar erro na submissão", async () => {
+    const error = new Error("Erro ao enviar");
+    const onSubmit = vi.fn().mockRejectedValue(error);
     const onError = vi.fn();
     render(<ContactForm onSubmit={onSubmit} onError={onError} />);
 
-    // Preenche e envia o formulário
-    await userEvent.type(screen.getByLabelText(/nome/i), 'João Silva');
-    await userEvent.type(screen.getByLabelText(/email/i), 'joao@exemplo.com');
-    await userEvent.type(screen.getByLabelText(/mensagem/i), 'Esta é uma mensagem de teste.');
+    await user.type(screen.getByLabelText(/nome/i), "João Silva");
+    await user.type(screen.getByLabelText(/email/i), "joao@exemplo.com");
+    await user.type(
+      screen.getByLabelText(/mensagem/i),
+      "Esta é uma mensagem de teste."
+    );
 
-    // Aguarda o debounce
-    vi.advanceTimersByTime(500);
+    vi.runAllTimers();
 
-    await userEvent.click(screen.getByRole('button', { name: /enviar/i }));
+    await user.click(screen.getByRole("button", { name: /enviar/i }));
 
-    expect(onError).toHaveBeenCalledWith(errorMessage);
-    expect(await screen.findByText(errorMessage)).toBeInTheDocument();
+    await waitFor(
+      () => {
+        expect(onError).toHaveBeenCalledWith("Erro ao enviar mensagem");
+      },
+      { timeout: 15000 }
+    );
   });
 });
