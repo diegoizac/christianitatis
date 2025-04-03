@@ -1,0 +1,15 @@
+# Navegadores Modernos
+last 2 versions
+> 0.5%
+not dead
+
+# Mobile
+iOS >= 12
+Android >= 5
+
+# Desktop
+Firefox ESR
+not IE 11
+
+# Performance
+not op_mini all 

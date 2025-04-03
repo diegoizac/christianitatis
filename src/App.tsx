@@ -4,7 +4,7 @@ import Footer from "./components/Footer";
 import Modal from "./components/Modal";
 // import CenteredThreeScene from './components/CenteredThreeScene';
 import LeftMenu from "./components/LeftMenu";
-import EventList from "./components/EventList/index";
+import EventList from "./components/EventList";
 import EventCard from "./components/EventCard";
 import Animation from "./components/Animation";
 import SocialIcons from "./components/SocialIcons";
@@ -14,70 +14,14 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loading from "./components/Loading";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { useCache } from "./hooks/useCache";
 import OptimizedImage from "./components/OptimizedImage";
+import { events } from "./data/events";
 
 function App() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
-  // Usando o hook de cache para os eventos
-  const {
-    data: events = [], // Definindo um valor padrão para events
-    loading: eventsLoading,
-    error: eventsError,
-  } = useCache(
-    async () => {
-      // Simulando uma chamada à API
-      return [
-        {
-          imageUrl: "./assets/images/nick-brasilia.png",
-          title: "15/04 - Brasília",
-          location: "Campus Arena da Sara Nossa Terra",
-          address: "Quadra 02, Com. 11, Lote 01, Vicente Pires, DF.",
-          time: "19H",
-          info: "@copevdf",
-        },
-        {
-          imageUrl: "./assets/images/nick-goiania.png",
-          title: "16/04 - Goiânia",
-          location: "Arena Videira Bueno",
-          address: "Av. T-7, 1361, Goiânia, GO.",
-          time: "19H",
-          info: "(062) 3251-0505",
-        },
-        {
-          imageUrl: "./assets/images/nick-ponta-grossa.png",
-          title: "17/04 - Ponta Grossa",
-          location: "Centro de Convenções do Avivamento",
-          address: "Av. Maria Rita Perpétuo da Cruz S/N, Ponta Grossa, PR.",
-          time: "19H",
-          info: "(042) 3223-7870",
-          videoUrl: "/assets/videos/video-nick-ponta-grossa.mp4",
-        },
-        {
-          imageUrl: "./assets/images/nick-belo-horizonte.png",
-          title: "18/04 - Belo Horizonte",
-          location: "Igreja Batista Getsêmani",
-          address: "Rua Cassiano Campolina 360, Belo Horizonte, MG.",
-          time: "19H",
-          info: "(031) 3448-9898",
-        },
-        {
-          imageUrl: "./assets/images/nick-belem.png",
-          title: "20/04 - Belém",
-          location: "Catedral da Família Foursquare",
-          address: "Tv Barão de Igarapé Mirim 977, Guamá, Belém, PA.",
-          time: "18H",
-          info: "(091) 99981-2091",
-          videoUrl: "/assets/videos/video-nick-belem.mp4",
-        },
-      ];
-    },
-    { key: "events", ttl: 3600 }
-  );
 
   const cityEvents = [
     {
@@ -219,9 +163,9 @@ function App() {
 
             {/* Grid de eventos */}
             <EventList
+              title="Próximos Eventos"
+              subtitle="Confira nossa agenda de eventos"
               events={events}
-              loading={eventsLoading}
-              error={eventsError}
             />
           </div>
         </Modal>

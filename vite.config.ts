@@ -4,6 +4,8 @@ import { viteStaticCopy } from "vite-plugin-static-copy";
 import { VitePWA } from "vite-plugin-pwa";
 import { visualizer } from "rollup-plugin-visualizer";
 import { configDefaults } from "vitest/config";
+import viteCompression from "vite-plugin-compression";
+import viteImagemin from "vite-plugin-imagemin";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -62,14 +64,57 @@ export default defineConfig({
     visualizer({
       filename: "./dist/stats.html",
     }),
+    viteCompression({
+      algorithm: "brotliCompress",
+      threshold: 1024,
+    }),
+    viteCompression({
+      algorithm: "gzip",
+      threshold: 1024,
+    }),
+    viteImagemin({
+      gifsicle: {
+        optimizationLevel: 7,
+        interlaced: false,
+      },
+      optipng: {
+        optimizationLevel: 7,
+      },
+      mozjpeg: {
+        quality: 80,
+      },
+      pngquant: {
+        quality: [0.8, 0.9],
+        speed: 4,
+      },
+      svgo: {
+        plugins: [
+          {
+            name: "removeViewBox",
+          },
+          {
+            name: "removeEmptyAttrs",
+            active: false,
+          },
+        ],
+      },
+    }),
   ],
   optimizeDeps: {
+    include: ["framer-motion"],
     exclude: ["lucide-react"],
   },
   build: {
     outDir: "dist",
     sourcemap: true,
     chunkSizeWarningLimit: 1000,
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
     rollupOptions: {
       onwarn(warning, warn) {
         if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
