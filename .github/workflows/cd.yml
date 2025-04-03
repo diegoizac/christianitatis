@@ -37,9 +37,10 @@ jobs:
       - name: Build
         run: npm run build
         env:
+          VITE_APP_ENV: production
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          VITE_ASAAS_API_KEY: ${{ secrets.VITE_ASAAS_API_KEY }}
+          VITE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.VITE_SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
@@ -54,24 +55,11 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     if: always()
-
     steps:
-      - name: Notify success
-        if: ${{ success() }}
+      - name: Notify Deploy Status
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: "#deployments"
-          SLACK_COLOR: "#36a64f"
-          SLACK_TITLE: "Deploy Successful 🚀"
-          SLACK_MESSAGE: "Christianitatis foi atualizado com sucesso!"
-
-      - name: Notify failure
-        if: ${{ failure() }}
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: "#deployments"
-          SLACK_COLOR: "#dc3545"
-          SLACK_TITLE: "Deploy Failed ❌"
-          SLACK_MESSAGE: "Falha no deploy do Christianitatis. Por favor, verifique os logs."
+          SLACK_COLOR: ${{ job.status == 'success' && 'good' || 'danger' }}
+          SLACK_TITLE: Deploy to Production
+          SLACK_MESSAGE: ${{ job.status == 'success' && '✅ Deploy concluído com sucesso!' || '❌ Falha no deploy!' }}
