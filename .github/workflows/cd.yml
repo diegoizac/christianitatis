@@ -22,6 +22,9 @@ jobs:
   deploy:
     needs: wait-for-approval
     runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: team_UxgqibrS2mGtoEs0cw0kqPN6
+      VERCEL_PROJECT_ID: prj_ZM8ZmQ6iHqPYpJwxFDPqlxKsFw50
     steps:
       - uses: actions/checkout@v4
 
@@ -38,18 +41,14 @@ jobs:
         run: npm run build
         env:
           VITE_APP_ENV: production
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_URL: https://levhtjaudduxxxgbpzgr.supabase.co
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          VITE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.VITE_SUPABASE_SERVICE_ROLE_KEY }}
+          VITE_APP_NAME: Christianitatis
+          VITE_APP_URL: https://christianitatis.org
+          VITE_APP_DESCRIPTION: "Eventos cristãos inspiradores"
 
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: "--prod"
-          working-directory: ./dist
+        run: npx vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
 
   notify:
     needs: deploy
