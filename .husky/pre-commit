@@ -1,14 +1,6 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
 
-# Executa o script de verificação de arquivos
-./scripts/check-files.sh
-
-# Se houver erro, impede o commit
-if [ $? -ne 0 ]; then
-  echo "❌ Por favor, salve todos os arquivos antes de fazer commit"
-  exit 1
+if [ "$SKIP_TESTS" != "true" ]; then
+  npm test
 fi
-
-# Executa o lint-staged
-exec >/dev/tty 2>&1
-npx lint-staged 

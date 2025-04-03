@@ -1,36 +1,42 @@
-import React, { useState, useEffect } from "react";
-import { Calendar, Heart, Mail, Menu } from "lucide-react";
+import React, { useState, useEffect } from 'react'
+import {
+  CalendarIcon,
+  HeartIcon,
+  EnvelopeIcon,
+  Bars3Icon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline'
 
 interface LeftMenuProps {
-  setActiveModal: (modalId: string | null) => void;
+  setActiveModal: (modalId: string | null) => void
 }
 
 const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   // Check if we're on mobile
   useEffect(() => {
     const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+      setIsMobile(window.innerWidth < 768)
+    }
 
     // Initial check
-    checkIfMobile();
+    checkIfMobile()
 
     // Add event listener for window resize
-    window.addEventListener("resize", checkIfMobile);
+    window.addEventListener('resize', checkIfMobile)
 
     // Cleanup
-    return () => window.removeEventListener("resize", checkIfMobile);
-  }, []);
+    return () => window.removeEventListener('resize', checkIfMobile)
+  }, [])
 
   const handleMenuItemClick = (modalId: string) => {
-    setActiveModal(modalId);
+    setActiveModal(modalId)
     if (isMobile) {
-      setIsMenuOpen(false);
+      setIsMenuOpen(false)
     }
-  };
+  }
 
   return (
     <div className="left-menu-container relative">
@@ -39,7 +45,7 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
           className="absolute top-4 left-4 z-50 bg-white p-2 rounded-md shadow-md"
           onClick={() => setIsMenuOpen(true)}
         >
-          <Menu className="h-6 w-6" />
+          <Bars3Icon className="h-6 w-6" />
         </button>
       )}
       {/* Menu content - always visible on desktop, toggleable on mobile */}
@@ -47,7 +53,7 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
         className={`
           flex flex-col items-start justify-center py-8 px-4 h-screen
           fixed left-0 top-0 z-50 bg-transparent shadow-lg w-64 transform transition-transform duration-300 ease-in-out
-          ${isMobile && !isMenuOpen ? "-translate-x-full" : "translate-x-0"}
+          ${isMobile && !isMenuOpen ? '-translate-x-full' : 'translate-x-0'}
         `}
       >
         <ul className="space-y-6 w-full">
@@ -55,12 +61,12 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
             <a
               href="#"
               className="flex items-center space-x-2 text-gray-800 hover:text-blue-600 font-medium text-lg w-full bg-white bg-opacity-75 p-2 rounded-md shadow-md"
-              onClick={(e) => {
-                e.preventDefault();
-                handleMenuItemClick("eventos-modal");
+              onClick={e => {
+                e.preventDefault()
+                handleMenuItemClick('eventos-modal')
               }}
             >
-              <Calendar className="h-5 w-5 mr-2" />
+              <CalendarIcon className="h-5 w-5 mr-2" />
               <span>Eventos</span>
             </a>
           </li>
@@ -68,12 +74,12 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
             <a
               href="#"
               className="flex items-center space-x-2 text-gray-800 hover:text-blue-600 font-medium text-lg w-full bg-white bg-opacity-75 p-2 rounded-md shadow-md"
-              onClick={(e) => {
-                e.preventDefault();
-                handleMenuItemClick("apoie-modal");
+              onClick={e => {
+                e.preventDefault()
+                handleMenuItemClick('apoie-modal')
               }}
             >
-              <Heart className="h-5 w-5 mr-2" />
+              <HeartIcon className="h-5 w-5 mr-2" />
               <span>Apoie o Movimento</span>
             </a>
           </li>
@@ -81,12 +87,12 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
             <a
               href="#"
               className="flex items-center space-x-2 text-gray-800 hover:text-blue-600 font-medium text-lg w-full bg-white bg-opacity-75 p-2 rounded-md shadow-md"
-              onClick={(e) => {
-                e.preventDefault();
-                handleMenuItemClick("contato-modal");
+              onClick={e => {
+                e.preventDefault()
+                handleMenuItemClick('contato-modal')
               }}
             >
-              <Mail className="h-5 w-5 mr-2" />
+              <EnvelopeIcon className="h-5 w-5 mr-2" />
               <span>Contato</span>
             </a>
           </li>
@@ -122,11 +128,11 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
           className="fixed top-4 right-4 z-50 bg-white p-2 rounded-md shadow-md"
           onClick={() => setIsMenuOpen(false)}
         >
-          X
+          <XMarkIcon className="h-6 w-6" />
         </button>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default LeftMenu;
+export default LeftMenu
