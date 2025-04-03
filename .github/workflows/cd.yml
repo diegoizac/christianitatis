@@ -1,25 +1,45 @@
 name: CD
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types:
-      - completed
+  push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  wait-for-approval:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
+      - name: Manual Approval
+        uses: trstringer/manual-approval@v1
         with:
-          name: build
-          path: dist/
+          secret: ${{ github.token }}
+          approvers: diegoizac
+          minimum-approvals: 1
+          issue-title: "Aprovar Deploy para Produção"
+          issue-body: "Por favor, revise e aprove o deploy para produção."
+          exclude-workflow-initiator-as-approver: false
+
+  deploy:
+    needs: wait-for-approval
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_ASAAS_API_KEY: ${{ secrets.VITE_ASAAS_API_KEY }}
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
@@ -28,7 +48,7 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: "--prod"
-          working-directory: ./
+          working-directory: ./dist
 
   notify:
     needs: deploy
