@@ -1,9 +1,10 @@
-import React, { useEffect, useState, Suspense, lazy } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Modal from "./components/Modal";
 // import CenteredThreeScene from './components/CenteredThreeScene';
 import LeftMenu from "./components/LeftMenu";
+import EventList from "./components/EventList/index";
 import EventCard from "./components/EventCard";
 import Animation from "./components/Animation";
 import SocialIcons from "./components/SocialIcons";
@@ -16,12 +17,6 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { useCache } from "./hooks/useCache";
 import OptimizedImage from "./components/OptimizedImage";
 
-// Lazy loading dos componentes principais
-const HeaderLazy = lazy(() => import("./components/Header"));
-const FooterLazy = lazy(() => import("./components/Footer"));
-const EventList = lazy(() => import("./components/EventList"));
-const ContactFormLazy = lazy(() => import("./components/ContactForm"));
-
 function App() {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -30,7 +25,7 @@ function App() {
 
   // Usando o hook de cache para os eventos
   const {
-    data: events,
+    data: events = [], // Definindo um valor padrão para events
     loading: eventsLoading,
     error: eventsError,
   } = useCache(
@@ -188,120 +183,96 @@ function App() {
     <ErrorBoundary>
       <div className="main-container bg-gray-100 relative min-h-screen">
         <ToastContainer position="top-right" autoClose={5000} />
-        <Suspense fallback={<Loading />}>
-          <HeaderLazy isScrolled={isScrolled} setActiveModal={setActiveModal} />
-          <main className="flex flex-grow pt-16">
-            <LeftMenu setActiveModal={setActiveModal} />
-            <div className="flex items-center justify-center flex-grow">
-              <Animation
-                style={{ position: "absolute", inset: 0, objectFit: "cover" }}
-              />
-            </div>
-          </main>
-          <FooterLazy setActiveModal={setActiveModal} />
-        </Suspense>
+        <Header isScrolled={isScrolled} setActiveModal={setActiveModal} />
+        <main className="flex flex-grow pt-16">
+          <LeftMenu setActiveModal={setActiveModal} />
+          <div className="flex items-center justify-center flex-grow">
+            <Animation
+              style={{ position: "absolute", inset: 0, objectFit: "cover" }}
+            />
+          </div>
+        </main>
+        <Footer setActiveModal={setActiveModal} />
 
         {/* Modals */}
-        <Suspense fallback={<Loading />}>
-          <Modal
-            id="eventos-modal"
-            isOpen={activeModal === "eventos-modal"}
-            onClose={() => setActiveModal(null)}
-            title="Eventos"
-          >
-            <div className="modal-content-inner">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800">
-                Próximos Eventos
-              </h2>
+        <Modal
+          id="eventos-modal"
+          isOpen={activeModal === "eventos-modal"}
+          onClose={() => setActiveModal(null)}
+          title="Eventos"
+        >
+          <div className="modal-content-inner">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">
+              Próximos Eventos
+            </h2>
 
-              {/* Banner principal com OptimizedImage */}
-              <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
-                <OptimizedImage
-                  src="/assets/images/todos-eventos.jpeg"
-                  alt="Todos os eventos"
-                  width={800}
-                  height={400}
-                  className="w-full h-auto"
+            {/* Banner principal com OptimizedImage */}
+            <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
+              <OptimizedImage
+                src="/assets/images/todos-eventos.jpeg"
+                alt="Todos os eventos"
+                width={800}
+                height={400}
+                className="w-full h-auto"
+              />
+            </div>
+
+            {/* Grid de eventos */}
+            <EventList
+              events={events}
+              loading={eventsLoading}
+              error={eventsError}
+            />
+          </div>
+        </Modal>
+
+        <Modal
+          id="apoie-modal"
+          isOpen={activeModal === "apoie-modal"}
+          onClose={() => setActiveModal(null)}
+          title="Apoie o Movimento"
+        >
+          <div className="modal-content-inner">
+            <h2 className="text-2xl font-bold mb-4">APOIE-NOS</h2>
+            <h3 className="text-xl font-semibold mb-2">
+              Como Você Pode Ajudar
+            </h3>
+            <p className="mb-4">
+              Sua contribuição é essencial para continuarmos nosso trabalho.
+              Apoie-nos com doações ou participando dos nossos eventos!
+            </p>
+
+            <h3 className="text-xl font-semibold mt-6 mb-2">Doações via PIX</h3>
+            <div className="pix-info-placeholder mb-4 p-4 border rounded-lg">
+              <div className="text-center">
+                <img
+                  className="inline"
+                  src="./assets/images/PIX-Christianitatis.png"
+                  alt="pix"
                 />
               </div>
-
-              {/* Grid de eventos */}
-              {eventsLoading ? (
-                <Loading />
-              ) : eventsError ? (
-                <div className="text-red-500">
-                  Erro ao carregar eventos. Tente novamente mais tarde.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {events?.map((event, index) => (
-                    <EventCard
-                      key={index}
-                      {...event}
-                      onClick={() => {
-                        if (event.videoUrl) {
-                          // Lógica para abrir o vídeo
-                          window.open(event.videoUrl, "_blank");
-                        }
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </Modal>
-
-          <Modal
-            id="apoie-modal"
-            isOpen={activeModal === "apoie-modal"}
-            onClose={() => setActiveModal(null)}
-            title="Apoie o Movimento"
-          >
-            <div className="modal-content-inner">
-              <h2 className="text-2xl font-bold mb-4">APOIE-NOS</h2>
-              <h3 className="text-xl font-semibold mb-2">
-                Como Você Pode Ajudar
-              </h3>
-              <p className="mb-4">
-                Sua contribuição é essencial para continuarmos nosso trabalho.
-                Apoie-nos com doações ou participando dos nossos eventos!
+              <p className="text-center mt-4 text-sm text-gray-600">
+                Banco: 033 | Agência: 3477 | Conta: 13011157-8
+                <br />
+                CNPJ: 18.900.689/0001-76
+                <br />
+                Favorecido: ASSOCIAÇÃO CHRISTIANITATIS
               </p>
-
-              <h3 className="text-xl font-semibold mt-6 mb-2">
-                Doações via PIX
-              </h3>
-              <div className="pix-info-placeholder mb-4 p-4 border rounded-lg">
-                {/*  QR Code Image Placeholder */}
-                <div className="text-center">
-                  <img
-                    className="inline"
-                    src="./assets/images/PIX-Christianitatis.png"
-                    alt="pix"
-                  />
-                </div>
-                <p className="text-center mt-4 text-sm text-gray-600">
-                  Banco: 033 | Agência: 3477 | Conta: 13011157-8
-                  <br />
-                  CNPJ: 18.900.689/0001-76
-                  <br />
-                  Favorecido: ASSOCIAÇÃO CHRISTIANITATIS
-                </p>
-              </div>
             </div>
-          </Modal>
+          </div>
+        </Modal>
 
-          <Modal
-            id="contato-modal"
-            isOpen={activeModal === "contato-modal"}
-            onClose={() => setActiveModal(null)}
-            title="Contato"
-          >
-            <ContactFormLazy
-              onSuccess={handleFormSuccess}
-              onError={handleFormError}
-            />
-          </Modal>
-        </Suspense>
+        <Modal
+          id="contato-modal"
+          isOpen={activeModal === "contato-modal"}
+          onClose={() => setActiveModal(null)}
+          title="Contato"
+        >
+          <ContactForm
+            onSuccess={handleFormSuccess}
+            onError={handleFormError}
+          />
+        </Modal>
       </div>
     </ErrorBoundary>
   );
