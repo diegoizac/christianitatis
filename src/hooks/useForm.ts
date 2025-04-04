@@ -1,22 +1,36 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback } from 'react'
 
-type ValidationRule<T> = {
-  validate: (value: T) => boolean;
-  message: string;
-};
+export type ValidationRule<T> = {
+  validate: (value: T) => boolean
+  message: string
+}
 
-type FieldConfig<T> = {
-  initialValue: T;
-  validate?: ValidationRule<T>[];
-};
+export type FieldConfig<T> = {
+  initialValue: T
+  validate?: ValidationRule<T>[]
+}
 
-type FormConfig<T> = {
-  [K in keyof T]: FieldConfig<T[K]>;
-};
+export type FormConfig<T> = {
+  [K in keyof T]: FieldConfig<T[K]>
+}
 
-type FormErrors<T> = {
-  [K in keyof T]?: string;
-};
+export type FormErrors<T> = {
+  [K in keyof T]?: string
+}
+
+export type FormValues<T> = {
+  [K in keyof T]: T[K]
+}
+
+export type UseFormReturn<T> = {
+  values: FormValues<T>
+  errors: FormErrors<T>
+  isDirty: Record<keyof T, boolean>
+  handleChange: (name: keyof T, value: T[keyof T]) => void
+  handleSubmit: (onSubmit: (values: T) => void | Promise<void>) => (e?: React.FormEvent) => void
+  resetForm: () => void
+  validateForm: () => boolean
+}
 
 /**
  * Hook para gerenciar estados e validações de formulário
@@ -35,85 +49,85 @@ type FormErrors<T> = {
  *   }
  * })
  */
-export function useForm<T extends Record<string, any>>(config: FormConfig<T>) {
+export function useForm<T extends Record<string, unknown>>(
+  config: FormConfig<T>
+): UseFormReturn<T> {
   const initialValues = Object.entries(config).reduce((acc, [key, field]) => {
-    acc[key as keyof T] = field.initialValue;
-    return acc;
-  }, {} as T);
+    acc[key as keyof T] = field.initialValue
+    return acc
+  }, {} as T)
 
-  const [values, setValues] = useState<T>(initialValues);
-  const [errors, setErrors] = useState<FormErrors<T>>({});
-  const [isDirty, setIsDirty] = useState<Record<keyof T, boolean>>(
-    {} as Record<keyof T, boolean>
-  );
+  const [values, setValues] = useState<T>(initialValues)
+  const [errors, setErrors] = useState<FormErrors<T>>({})
+  const [isDirty, setIsDirty] = useState<Record<keyof T, boolean>>({} as Record<keyof T, boolean>)
 
   const validateField = useCallback(
     (name: keyof T, value: T[keyof T]): string | undefined => {
-      const fieldConfig = config[name];
-      if (!fieldConfig.validate) return undefined;
+      const fieldConfig = config[name]
+      if (!fieldConfig.validate) return undefined
 
       for (const rule of fieldConfig.validate) {
         if (!rule.validate(value)) {
-          return rule.message;
+          return rule.message
         }
       }
 
-      return undefined;
+      return undefined
     },
     [config]
-  );
+  )
 
   const handleChange = useCallback(
     (name: keyof T, value: T[keyof T]) => {
-      setValues((prev) => ({ ...prev, [name]: value }));
-      setIsDirty((prev) => ({ ...prev, [name]: true }));
+      setValues(prev => ({ ...prev, [name]: value }))
+      setIsDirty(prev => ({ ...prev, [name]: true }))
 
-      const error = validateField(name, value);
-      setErrors((prev) => ({
+      const error = validateField(name, value)
+      setErrors(prev => ({
         ...prev,
         [name]: error,
-      }));
+      }))
     },
     [validateField]
-  );
+  )
 
   const validateForm = useCallback((): boolean => {
-    const newErrors: FormErrors<T> = {};
-    let isValid = true;
+    const newErrors: FormErrors<T> = {}
+    let isValid = true
 
-    Object.keys(values).forEach((key) => {
-      const error = validateField(key as keyof T, values[key as keyof T]);
+    Object.keys(values).forEach(key => {
+      const error = validateField(key as keyof T, values[key as keyof T])
       if (error) {
-        newErrors[key as keyof T] = error;
-        isValid = false;
+        newErrors[key as keyof T] = error
+        isValid = false
       }
-    });
+    })
 
-    setErrors(newErrors);
-    return isValid;
-  }, [values, validateField]);
+    setErrors(newErrors)
+    return isValid
+  }, [values, validateField])
 
   const handleSubmit = useCallback(
-    (onSubmit: (values: T) => void) => {
-      return (e?: React.FormEvent) => {
+    (onSubmit: (values: T) => void | Promise<void>) => {
+      return async (e?: React.FormEvent) => {
         if (e) {
-          e.preventDefault();
+          e.preventDefault()
         }
 
-        const isValid = validateForm();
+        const isValid = validateForm()
         if (isValid) {
-          onSubmit(values);
+          await onSubmit(values)
         }
-      };
+      }
     },
     [values, validateForm]
-  );
+  )
 
   const resetForm = useCallback(() => {
-    setValues(initialValues);
-    setErrors({});
-    setIsDirty({} as Record<keyof T, boolean>);
-  }, [initialValues]);
+    setValues(initialValues)
+    setErrors({})
+    setIsDirty({} as Record<keyof T, boolean>)
+  }, [initialValues])
 
   return {
     values,
@@ -123,5 +137,5 @@ export function useForm<T extends Record<string, any>>(config: FormConfig<T>) {
     handleSubmit,
     resetForm,
     validateForm,
-  };
+  }
 }

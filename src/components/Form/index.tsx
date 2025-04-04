@@ -1,26 +1,16 @@
-import {
-  FC,
-  FormHTMLAttributes,
-  ReactNode,
-  cloneElement,
-  isValidElement,
-} from "react";
-import { useForm } from "../../hooks/useForm";
+import { FormHTMLAttributes, ReactNode } from 'react'
+import { useForm, FormConfig } from '../../hooks/useForm'
 
-interface FormProps<T extends Record<string, any>>
-  extends Omit<FormHTMLAttributes<HTMLFormElement>, "onSubmit"> {
-  /**
-   * Configuração dos campos do formulário
-   */
-  config: Parameters<typeof useForm>[0];
-  /**
-   * Função chamada quando o formulário é submetido com sucesso
-   */
-  onSubmit: (values: T) => void;
-  /**
-   * Elementos filhos do formulário (inputs, buttons, etc)
-   */
-  children: ReactNode | ((formProps: ReturnType<typeof useForm>) => ReactNode);
+interface FormProps<T> {
+  children: (props: {
+    values: T
+    errors: Partial<Record<keyof T, string>>
+    handleChange: (field: keyof T, value: T[keyof T]) => void
+    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
+  }) => ReactNode
+  config: FormConfig<T>
+  onSubmit: (data: T) => void | Promise<void>
+  className?: string
 }
 
 /**
@@ -50,60 +40,22 @@ interface FormProps<T extends Record<string, any>>
  *   )}
  * </Form>
  */
-export function Form<T extends Record<string, any>>({
-  config,
-  onSubmit,
-  children,
-  ...props
-}: FormProps<T>) {
-  const form = useForm<T>(config);
-  const { handleSubmit } = form;
+export function Form<T>({ children, config, onSubmit, className, ...props }: FormProps<T>) {
+  const { values, errors, handleChange, handleSubmit } = useForm<T>(config)
 
-  const renderChildren = () => {
-    if (typeof children === "function") {
-      return children(form);
-    }
-
-    return children;
-  };
-
-  const enhanceInputs = (node: ReactNode): ReactNode => {
-    if (!isValidElement(node)) {
-      return node;
-    }
-
-    if (
-      node.type === "input" ||
-      (typeof node.type === "function" && node.type.name === "Input")
-    ) {
-      const name = node.props.name;
-      if (name && name in form.values) {
-        return cloneElement(node, {
-          value: form.values[name],
-          onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-            form.handleChange(name, e.target.value);
-            node.props.onChange?.(e);
-          },
-          error: form.errors[name],
-          "aria-invalid": !!form.errors[name],
-        });
-      }
-    }
-
-    if (node.props.children) {
-      const children = Array.isArray(node.props.children)
-        ? node.props.children.map((child) => enhanceInputs(child))
-        : enhanceInputs(node.props.children);
-
-      return cloneElement(node, { children });
-    }
-
-    return node;
-  };
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    handleSubmit(onSubmit)(e)
+  }
 
   return (
-    <form {...props} onSubmit={handleSubmit(onSubmit)} noValidate>
-      {enhanceInputs(renderChildren())}
+    <form noValidate onSubmit={handleFormSubmit} className={className} {...props}>
+      {children({
+        values,
+        errors,
+        handleChange,
+        handleSubmit: handleFormSubmit,
+      })}
     </form>
-  );
+  )
 }

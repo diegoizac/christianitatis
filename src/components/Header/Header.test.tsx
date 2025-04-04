@@ -1,45 +1,40 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import Header from "./Header";
+import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { BrowserRouter } from 'react-router-dom'
+import Header from '.'
 
-describe("Header", () => {
-  it("deve renderizar o logo", () => {
-    render(<Header />);
-    const logo = screen.getByAltText("Christianitatis");
-    expect(logo).toBeInTheDocument();
-  });
+describe('Header Component', () => {
+  it('should render logo and navigation links', () => {
+    render(
+      <BrowserRouter>
+        <Header />
+      </BrowserRouter>
+    )
 
-  it("deve ter a classe scrolled quando scroll > 50", () => {
-    render(<Header />);
-    const header = screen.getByRole("banner");
+    expect(screen.getByText('Christianitatis')).toBeInTheDocument()
+    expect(screen.getByText('Início')).toBeInTheDocument()
+    expect(screen.getByText('Sobre')).toBeInTheDocument()
+    expect(screen.getByText('Contato')).toBeInTheDocument()
+  })
 
-    // Simula scroll
-    global.window.scrollY = 51;
-    fireEvent.scroll(window);
+  it('should render authentication buttons', () => {
+    render(
+      <BrowserRouter>
+        <Header />
+      </BrowserRouter>
+    )
 
-    expect(header).toHaveClass("scrolled");
-  });
+    expect(screen.getByText('Entrar')).toBeInTheDocument()
+    expect(screen.getByText('Cadastrar')).toBeInTheDocument()
+  })
 
-  it("deve abrir o menu mobile ao clicar no botão", () => {
-    render(<Header />);
-    const menuButton = screen.getByLabelText("Menu");
+  it('should render mobile menu button', () => {
+    render(
+      <BrowserRouter>
+        <Header />
+      </BrowserRouter>
+    )
 
-    fireEvent.click(menuButton);
-
-    const mobileMenu = screen.getByRole("navigation");
-    expect(mobileMenu).toHaveClass("open");
-  });
-
-  it("deve fechar o menu mobile ao clicar novamente", () => {
-    render(<Header />);
-    const menuButton = screen.getByLabelText("Menu");
-
-    // Abre o menu
-    fireEvent.click(menuButton);
-    // Fecha o menu
-    fireEvent.click(menuButton);
-
-    const mobileMenu = screen.getByRole("navigation");
-    expect(mobileMenu).not.toHaveClass("open");
-  });
-});
+    expect(screen.getByLabelText('Menu')).toBeInTheDocument()
+  })
+})

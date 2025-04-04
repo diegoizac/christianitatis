@@ -255,3 +255,54 @@ not op_mini all
 - [Console Supabase](https://app.supabase.io)
 - [Analytics](https://vercel.com/analytics)
 - [Documentação API](./API_DOCS.md)
+
+## 🔧 Ferramentas de Desenvolvimento
+
+### Browser Tools
+
+O projeto inclui uma configuração personalizada de ferramentas do navegador para auxiliar no desenvolvimento:
+
+\`\`\`typescript
+// src/config/browser-tools.config.ts
+export const browserToolsConfig: BrowserToolsConfig = {
+enableConsoleLogging: true,
+enableNetworkLogging: true,
+enablePerformanceAudit: true,
+enableAccessibilityAudit: true,
+enableSEOAudit: true,
+enableBestPracticesAudit: true,
+enableNextJSAudit: false, // Desabilitado pois usamos Vite
+debuggerMode: true,
+}
+\`\`\`
+
+Estas configurações permitem:
+
+- Logging avançado no console
+- Monitoramento de requisições de rede
+- Auditorias automáticas de performance
+- Verificações de acessibilidade
+- Análise de SEO
+- Validação de boas práticas
+
+### Componentes Principais
+
+#### Section Component
+
+Componente base para seções da página com suporte a:
+
+- Títulos e subtítulos
+- Variantes de estilo (default/alternate)
+- Classes CSS customizáveis
+- Integração com sistema de navegação
+
+\`\`\`typescript
+interface SectionProps extends HTMLAttributes<HTMLElement> {
+title?: string
+subtitle?: string
+children: React.ReactNode
+className?: string
+id?: string
+variant?: 'default' | 'alternate'
+}
+\`\`\`

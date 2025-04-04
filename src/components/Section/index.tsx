@@ -1,97 +1,58 @@
-import { ReactNode } from "react";
-import { motion } from "framer-motion";
-import { clsx } from "clsx";
+import { HTMLAttributes } from 'react'
+import clsx from 'clsx'
 
-interface SectionProps {
+interface SectionProps extends HTMLAttributes<HTMLElement> {
   /**
    * Título da seção
    */
-  title: string;
+  title?: string
   /**
    * Subtítulo da seção
    */
-  subtitle?: string;
+  subtitle?: string
   /**
    * Conteúdo da seção
    */
-  children: ReactNode;
+  children: React.ReactNode
   /**
    * Classes CSS adicionais
    */
-  className?: string;
+  className?: string
   /**
    * ID da seção para navegação
    */
-  id?: string;
+  id?: string
   /**
    * Variante da seção
    */
-  variant?: "default" | "alternate";
+  variant?: 'default' | 'alternate'
 }
 
 export default function Section({
   title,
   subtitle,
-  children,
+  variant = 'default',
   className,
-  id,
-  variant = "default",
+  children,
+  ...props
 }: SectionProps) {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  };
-
   return (
-    <motion.section
-      id={id}
-      variants={containerVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-100px" }}
+    <section
       className={clsx(
-        "py-24",
-        variant === "alternate"
-          ? "bg-gray-50 dark:bg-gray-900"
-          : "bg-white dark:bg-gray-800",
+        'py-16',
+        {
+          'bg-white': variant === 'default',
+          'bg-gray-50': variant === 'alternate',
+        },
         className
       )}
+      {...props}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          variants={itemVariants}
-          className="max-w-3xl mx-auto text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
-            {title}
-          </h2>
-          {subtitle && (
-            <p className="text-xl text-secondary leading-relaxed">{subtitle}</p>
-          )}
-        </motion.div>
-
-        <motion.div variants={itemVariants} className="w-full">
-          {children}
-        </motion.div>
+      <div className="container mx-auto px-4">
+        {title && <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">{title}</h2>}
+        {subtitle && <p className="text-xl text-gray-600 text-center mb-8">{subtitle}</p>}
+        {children}
       </div>
-    </motion.section>
-  );
+    </section>
+  )
 }
