@@ -1,70 +1,70 @@
-import { ReactNode } from "react";
-import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
-import { clsx } from "clsx";
+import { ReactNode } from 'react'
+import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
+import { clsx } from 'clsx'
 
 interface CardProps {
   /**
    * Título do card
    */
-  title?: string;
+  title?: string
   /**
    * Subtítulo do card
    */
-  subtitle?: string;
+  subtitle?: string
   /**
    * Conteúdo do card
    */
-  children: ReactNode;
+  children: ReactNode
   /**
    * Tags para categorização
    */
-  tags?: string[];
+  tags?: string[]
   /**
    * Link para mais detalhes
    */
-  href?: string;
+  href?: string
   /**
    * Imagem de fundo ou thumbnail
    */
-  image?: string;
+  image?: string
   /**
    * Classes CSS adicionais
    */
-  className?: string;
+  className?: string
   /**
    * Variante do card
    */
-  variant?: "default" | "project" | "feature";
+  variant?: 'default' | 'project' | 'feature'
   /**
    * Tamanho do card
    */
-  size?: "sm" | "md" | "lg";
-  onClick?: () => void;
+  size?: 'sm' | 'md' | 'lg'
+  onClick?: () => void
 }
 
 const cardSizes = {
   sm: {
-    card: "max-w-sm",
-    image: "h-40",
-    title: "text-lg",
-    subtitle: "text-sm",
-    content: "text-sm",
+    card: 'max-w-sm',
+    image: 'h-40',
+    title: 'text-lg',
+    subtitle: 'text-sm',
+    content: 'text-sm',
   },
   md: {
-    card: "max-w-md",
-    image: "h-48",
-    title: "text-xl",
-    subtitle: "text-base",
-    content: "text-base",
+    card: 'max-w-md',
+    image: 'h-48',
+    title: 'text-xl',
+    subtitle: 'text-base',
+    content: 'text-base',
   },
   lg: {
-    card: "max-w-lg",
-    image: "h-56",
-    title: "text-2xl",
-    subtitle: "text-lg",
-    content: "text-lg",
+    card: 'max-w-lg',
+    image: 'h-56',
+    title: 'text-2xl',
+    subtitle: 'text-lg',
+    content: 'text-lg',
   },
-};
+}
 
 export function Card({
   title,
@@ -74,19 +74,19 @@ export function Card({
   href,
   image,
   className,
-  variant = "default",
-  size = "md",
+  variant = 'default',
+  size = 'md',
   onClick,
 }: CardProps) {
   // Mouse position para efeito de spotlight
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { left, top } = e.currentTarget.getBoundingClientRect();
-    mouseX.set(e.clientX - left);
-    mouseY.set(e.clientY - top);
-  };
+    const { left, top } = e.currentTarget.getBoundingClientRect()
+    mouseX.set(e.clientX - left)
+    mouseY.set(e.clientY - top)
+  }
 
   // Variantes de animação
   const cardVariants = {
@@ -96,14 +96,14 @@ export function Card({
       y: 0,
       transition: {
         duration: 0.5,
-        ease: "easeOut",
+        ease: 'easeOut',
       },
     },
     hover: {
       y: -10,
       transition: {
         duration: 0.3,
-        type: "spring",
+        type: 'spring',
         stiffness: 300,
         damping: 20,
       },
@@ -114,20 +114,20 @@ export function Card({
         duration: 0.1,
       },
     },
-  };
+  }
 
-  const sizes = cardSizes[size];
+  const sizes = cardSizes[size]
 
   const Content = () => (
     <motion.div
       onMouseMove={handleMouseMove}
       className={clsx(
-        "relative w-full h-full rounded-xl overflow-hidden",
-        "bg-gradient-to-br from-white to-gray-50",
-        "dark:from-gray-800 dark:to-gray-900",
-        "shadow-lg hover:shadow-xl transition-all duration-300",
-        "border border-gray-100 dark:border-gray-700",
-        "group",
+        'relative w-full h-full rounded-xl overflow-hidden',
+        'bg-gradient-to-br from-white to-gray-50',
+        'dark:from-gray-800 dark:to-gray-900',
+        'shadow-lg hover:shadow-xl transition-all duration-300',
+        'border border-gray-100 dark:border-gray-700',
+        'group',
         sizes.card,
         className
       )}
@@ -147,7 +147,7 @@ export function Card({
       />
 
       {image && (
-        <div className={clsx("relative w-full overflow-hidden", sizes.image)}>
+        <div className={clsx('relative w-full overflow-hidden', sizes.image)}>
           <motion.img
             src={image}
             alt={title}
@@ -164,8 +164,8 @@ export function Card({
         {title && (
           <motion.h3
             className={clsx(
-              "font-bold mb-2",
-              "bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent",
+              'font-bold mb-2',
+              'bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent',
               sizes.title
             )}
             whileHover={{ x: 5 }}
@@ -178,8 +178,8 @@ export function Card({
         {subtitle && (
           <p
             className={clsx(
-              "text-secondary/80 mb-4",
-              "transform transition-all duration-300 group-hover:text-secondary",
+              'text-secondary/80 mb-4',
+              'transform transition-all duration-300 group-hover:text-secondary',
               sizes.subtitle
             )}
           >
@@ -189,9 +189,9 @@ export function Card({
 
         <div
           className={clsx(
-            "text-gray-600 dark:text-gray-300",
-            "transform transition-all duration-300",
-            "group-hover:text-gray-700 dark:group-hover:text-gray-200",
+            'text-gray-600 dark:text-gray-300',
+            'transform transition-all duration-300',
+            'group-hover:text-gray-700 dark:group-hover:text-gray-200',
             sizes.content
           )}
         >
@@ -204,17 +204,17 @@ export function Card({
             initial={{ opacity: 0.8 }}
             whileHover={{ opacity: 1 }}
           >
-            {tags.map((tag) => (
+            {tags.map(tag => (
               <motion.span
                 key={tag}
                 className={clsx(
-                  "px-3 py-1 rounded-full",
-                  "bg-accent/10 text-accent",
-                  "backdrop-blur-sm",
-                  "border border-accent/20",
-                  "text-xs md:text-sm",
-                  "transform transition-all duration-300",
-                  "hover:bg-accent/20 hover:scale-105"
+                  'px-3 py-1 rounded-full',
+                  'bg-accent/10 text-accent',
+                  'backdrop-blur-sm',
+                  'border border-accent/20',
+                  'text-xs md:text-sm',
+                  'transform transition-all duration-300',
+                  'hover:bg-accent/20 hover:scale-105'
                 )}
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
@@ -226,7 +226,7 @@ export function Card({
         )}
       </div>
     </motion.div>
-  );
+  )
 
   const cardContent = (
     <motion.div
@@ -240,7 +240,7 @@ export function Card({
     >
       <Content />
     </motion.div>
-  );
+  )
 
   if (href) {
     return (
@@ -252,8 +252,8 @@ export function Card({
       >
         {cardContent}
       </a>
-    );
+    )
   }
 
-  return cardContent;
+  return cardContent
 }

@@ -4,7 +4,7 @@ import { TextInput, Select, Textarea } from '../Input'
 import { Button } from '../Button'
 import { FaUser, FaEnvelope, FaPhone, FaTag, FaComment } from 'react-icons/fa'
 
-type ContactFormData = Record<string, string> & {
+export type ContactFormData = Record<string, string> & {
   name: string
   email: string
   phone: string

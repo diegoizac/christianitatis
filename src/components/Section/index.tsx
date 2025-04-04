@@ -34,10 +34,15 @@ export default function Section({
   variant = 'default',
   className,
   children,
+  id,
   ...props
 }: SectionProps) {
+  const titleId = id ? `${id}-title` : undefined
+
   return (
     <section
+      role="region"
+      aria-labelledby={titleId}
       className={clsx(
         'py-16',
         {
@@ -46,10 +51,15 @@ export default function Section({
         },
         className
       )}
+      id={id}
       {...props}
     >
       <div className="container mx-auto px-4">
-        {title && <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">{title}</h2>}
+        {title && (
+          <h2 id={titleId} className="text-3xl font-bold text-gray-900 text-center mb-4">
+            {title}
+          </h2>
+        )}
         {subtitle && <p className="text-xl text-gray-600 text-center mb-8">{subtitle}</p>}
         {children}
       </div>
