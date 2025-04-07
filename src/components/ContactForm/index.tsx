@@ -1,187 +1,157 @@
-import { useState, FormEvent } from 'react'
-import { supabase } from '../../lib/supabase'
-import { toast } from 'react-toastify'
+import { useState } from 'react'
+import { Form } from '../Form'
+import { TextInput, Select, Textarea } from '../Input'
+import { Button } from '../Button'
+import { FaUser, FaEnvelope, FaPhone, FaTag, FaComment } from 'react-icons/fa'
+
+export type ContactFormData = Record<string, string> & {
+  name: string
+  email: string
+  phone: string
+  subject: string
+  message: string
+}
 
 interface ContactFormProps {
-  onClose: () => void
+  onSubmit: (data: ContactFormData) => Promise<void>
 }
 
-interface EdgeFunctionError {
-  message?: string
-  error?: {
-    message?: string
-  }
-  debug?: {
-    timestamp?: string
-    errorType?: string
-  }
-}
-
-export default function ContactForm({ onClose }: ContactFormProps) {
-  const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
+const formConfig = {
+  initialValues: {
     name: '',
     email: '',
+    phone: '',
     subject: '',
     message: '',
-  })
+  },
+  validationRules: {
+    name: {
+      required: 'Nome é obrigatório',
+    },
+    email: {
+      required: 'Email é obrigatório',
+      pattern: {
+        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+        message: 'Email inválido',
+      },
+    },
+    message: {
+      required: 'Mensagem é obrigatória',
+    },
+  },
+}
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+export function ContactForm({ onSubmit }: ContactFormProps) {
+  const [isLoading, setIsLoading] = useState(false)
 
+  const handleSubmit = async (data: ContactFormData) => {
     try {
-      // Validação básica
-      if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-        throw new Error('Todos os campos são obrigatórios')
-      }
-
-      // Validação de email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(formData.email)) {
-        throw new Error('Email inválido')
-      }
-
-      // Salva a mensagem no Supabase
-      const { error: dbError } = await supabase.from('contact_messages').insert([formData])
-
-      if (dbError) {
-        console.error('Erro ao salvar mensagem:', dbError)
-        throw new Error('Erro ao salvar sua mensagem. Por favor, tente novamente.')
-      }
-
-      // Tenta enviar o email via Edge Function
-      try {
-        console.log('Enviando dados para Edge Function:', formData)
-
-        const { data, error: emailError } = await supabase.functions.invoke('send-contact-email', {
-          body: formData,
-        })
-
-        console.log('Resposta da Edge Function:', { data, error: emailError })
-
-        if (emailError) {
-          console.error('Erro ao enviar email:', emailError)
-          // Não lança erro aqui para não impedir o fluxo
-          toast.warning(
-            'Sua mensagem foi salva, mas houve um erro ao enviar o email de notificação.'
-          )
-        } else {
-          console.log('Email processado com sucesso:', data)
-          toast.success('Mensagem enviada com sucesso!')
-          onClose()
-        }
-      } catch (emailError) {
-        console.error('Erro na Edge Function:', emailError)
-
-        // Tenta extrair a mensagem de erro mais específica
-        const error = emailError as EdgeFunctionError
-        const errorMessage =
-          error?.message || error?.error?.message || 'Erro ao enviar email de notificação'
-
-        console.log('Mensagem de erro detalhada:', {
-          message: errorMessage,
-          debug: error?.debug,
-        })
-
-        // Não lança erro aqui para não impedir o fluxo
-        toast.warning(
-          `Sua mensagem foi salva, mas houve um erro ao enviar o email: ${errorMessage}`
-        )
-      }
-    } catch (error) {
-      console.error('Erro ao processar mensagem:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Erro ao enviar mensagem'
-      toast.error(errorMessage)
+      setIsLoading(true)
+      await onSubmit(data)
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-          Nome
-        </label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          disabled={loading}
-        />
-      </div>
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Entre em Contato</h2>
+      <p className="text-gray-600 mb-8">
+        Preencha o formulário abaixo e entraremos em contato o mais breve possível.
+      </p>
 
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Email
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          disabled={loading}
-        />
-      </div>
+      <Form<ContactFormData> config={formConfig} onSubmit={handleSubmit} className="space-y-6">
+        {({ values, errors, handleChange }) => (
+          <>
+            <TextInput
+              name="name"
+              label="Nome Completo"
+              placeholder="Seu nome completo"
+              value={values.name}
+              error={errors.name}
+              onChange={e => handleChange('name', e.target.value)}
+              required
+              leftIcon={<FaUser />}
+            />
 
-      <div>
-        <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
-          Assunto
-        </label>
-        <input
-          type="text"
-          id="subject"
-          name="subject"
-          value={formData.subject}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          disabled={loading}
-        />
-      </div>
+            <TextInput
+              name="email"
+              type="email"
+              label="Email"
+              placeholder="seu@email.com"
+              value={values.email}
+              error={errors.email}
+              onChange={e => handleChange('email', e.target.value)}
+              required
+              leftIcon={<FaEnvelope />}
+            />
 
-      <div>
-        <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-          Mensagem
-        </label>
-        <textarea
-          id="message"
-          name="message"
-          rows={4}
-          value={formData.message}
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          disabled={loading}
-        />
-      </div>
+            <TextInput
+              name="phone"
+              type="tel"
+              label="Telefone"
+              placeholder="(00) 00000-0000"
+              value={values.phone}
+              error={errors.phone}
+              onChange={e => handleChange('phone', e.target.value)}
+              leftIcon={<FaPhone />}
+            />
 
-      <div className="flex justify-end space-x-3">
-        <button
-          type="button"
-          onClick={onClose}
-          className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          disabled={loading}
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          disabled={loading}
-        >
-          {loading ? 'Enviando...' : 'Enviar'}
-        </button>
-      </div>
-    </form>
+            <Select
+              name="subject"
+              label="Assunto"
+              value={values.subject}
+              error={errors.subject}
+              onChange={e => handleChange('subject', e.target.value)}
+              leftIcon={<FaTag />}
+            >
+              <option value="">Selecione um assunto</option>
+              <option value="eventos">Eventos</option>
+              <option value="duvidas">Dúvidas</option>
+              <option value="sugestoes">Sugestões</option>
+              <option value="outros">Outros</option>
+            </Select>
+
+            <Textarea
+              name="message"
+              label="Mensagem"
+              placeholder="Digite sua mensagem aqui..."
+              value={values.message}
+              error={errors.message}
+              onChange={e => handleChange('message', e.target.value)}
+              rows={4}
+              required
+              leftIcon={<FaComment />}
+            />
+
+            <Button type="submit" variant="primary" isLoading={isLoading} className="w-full">
+              Enviar Mensagem
+            </Button>
+
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <p className="text-sm text-gray-600 text-center">
+                Você também pode nos contatar através de:
+              </p>
+              <div className="mt-4 flex justify-center space-x-6">
+                <a
+                  href="mailto:contato@christianitatis.com"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
+                  <FaEnvelope className="inline mr-2" />
+                  contato@christianitatis.com
+                </a>
+                <a
+                  href="tel:+5511999999999"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
+                  <FaPhone className="inline mr-2" />
+                  (11) 99999-9999
+                </a>
+              </div>
+            </div>
+          </>
+        )}
+      </Form>
+    </div>
   )
 }
