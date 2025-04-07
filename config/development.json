@@ -1,0 +1,22 @@
+{
+  "ports": {
+    "app": 3002,
+    "storybook": 6007,
+    "backend": 3000,
+    "mcp": 8000
+  },
+  "logs": {
+    "directory": "./logs",
+    "level": "debug"
+  },
+  "healthCheck": {
+    "interval": 10000,
+    "timeout": 5000
+  },
+  "mcp": {
+    "browser": {
+      "defaultUrl": "http://localhost:3002",
+      "openDevTools": true
+    }
+  }
+}
