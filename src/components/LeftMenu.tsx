@@ -1,137 +1,121 @@
 import React, { useState, useEffect } from 'react'
-import {
-  CalendarIcon,
-  HeartIcon,
-  EnvelopeIcon,
-  Bars3Icon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { FiMenu, FiX } from 'react-icons/fi'
 
 interface LeftMenuProps {
-  setActiveModal: (modalId: string | null) => void
+  setActiveModal: (modal: string | null) => void
 }
 
 const LeftMenu: React.FC<LeftMenuProps> = ({ setActiveModal }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
+  const isAdminPage = location.pathname.startsWith('/admin')
 
-  // Check if we're on mobile
   useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
     }
+  }, [isOpen])
 
-    // Initial check
-    checkIfMobile()
-
-    // Add event listener for window resize
-    window.addEventListener('resize', checkIfMobile)
-
-    // Cleanup
-    return () => window.removeEventListener('resize', checkIfMobile)
-  }, [])
-
-  const handleMenuItemClick = (modalId: string) => {
-    setActiveModal(modalId)
-    if (isMobile) {
-      setIsMenuOpen(false)
-    }
+  const handleNavigation = (path: string) => {
+    navigate(path)
+    setIsOpen(false)
   }
 
-  return (
-    <div className="left-menu-container relative">
-      {isMobile && !isMenuOpen && (
-        <button
-          className="absolute top-4 left-4 z-50 bg-white p-2 rounded-md shadow-md"
-          onClick={() => setIsMenuOpen(true)}
-        >
-          <Bars3Icon className="h-6 w-6" />
-        </button>
-      )}
-      {/* Menu content - always visible on desktop, toggleable on mobile */}
-      <nav
-        className={`
-          flex flex-col items-start justify-center py-8 px-4 h-screen
-          fixed left-0 top-0 z-50 bg-transparent shadow-lg w-64 transform transition-transform duration-300 ease-in-out
-          ${isMobile && !isMenuOpen ? '-translate-x-full' : 'translate-x-0'}
-        `}
+  const handleModalOpen = (modalId: string) => {
+    setIsOpen(false)
+    setTimeout(() => {
+      setActiveModal(modalId)
+    }, 300)
+  }
+
+  const renderAdminMenu = () => (
+    <nav className="flex flex-col gap-4 px-4 pt-16">
+      <button
+        onClick={() => handleNavigation('/admin/dashboard')}
+        className="text-gray-600 hover:text-blue-600 transition text-left py-2"
       >
-        <ul className="space-y-6 w-full">
-          <li>
-            <a
-              href="#"
-              className="flex items-center space-x-2 text-gray-800 hover:text-blue-600 font-medium text-lg w-full bg-white bg-opacity-75 p-2 rounded-md shadow-md"
-              onClick={e => {
-                e.preventDefault()
-                handleMenuItemClick('eventos-modal')
-              }}
-            >
-              <CalendarIcon className="h-5 w-5 mr-2" />
-              <span>Eventos</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="flex items-center space-x-2 text-gray-800 hover:text-blue-600 font-medium text-lg w-full bg-white bg-opacity-75 p-2 rounded-md shadow-md"
-              onClick={e => {
-                e.preventDefault()
-                handleMenuItemClick('apoie-modal')
-              }}
-            >
-              <HeartIcon className="h-5 w-5 mr-2" />
-              <span>Apoie o Movimento</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="flex items-center space-x-2 text-gray-800 hover:text-blue-600 font-medium text-lg w-full bg-white bg-opacity-75 p-2 rounded-md shadow-md"
-              onClick={e => {
-                e.preventDefault()
-                handleMenuItemClick('contato-modal')
-              }}
-            >
-              <EnvelopeIcon className="h-5 w-5 mr-2" />
-              <span>Contato</span>
-            </a>
-          </li>
-          {/* <li>
-            <a
-              href="#"
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium text-lg w-full"
-              onClick={(e) => {
-                e.preventDefault();
-                handleMenuItemClick("login-modal");
-              }}
-            >
-              <span>Login</span>
-            </a>
-          </li> */}
-          {/* <li>
-            <a
-              href="#"
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium text-lg w-full"
-              onClick={(e) => {
-                e.preventDefault();
-                handleMenuItemClick("idioma-modal");
-              }}
-            >
-              <span>Idioma</span>
-            </a>
-          </li> */}
-        </ul>
-      </nav>
-      {/* Botão para fechar o menu em mobile */}
-      {isMobile && isMenuOpen && (
+        Dashboard
+      </button>
+      <button
+        onClick={() => handleNavigation('/admin/users')}
+        className="text-gray-600 hover:text-blue-600 transition text-left py-2"
+      >
+        Usuários
+      </button>
+      <button
+        onClick={() => handleNavigation('/admin/events')}
+        className="text-gray-600 hover:text-blue-600 transition text-left py-2"
+      >
+        Eventos
+      </button>
+    </nav>
+  )
+
+  const renderMainMenu = () => (
+    <nav className="flex flex-col gap-4 px-4 pt-16">
+      <button
+        onClick={() => handleNavigation('/events')}
+        className="text-gray-600 hover:text-blue-600 transition text-left py-2"
+      >
+        Eventos
+      </button>
+      <button
+        onClick={() => handleModalOpen('support')}
+        className="text-gray-600 hover:text-blue-600 transition text-left py-2"
+      >
+        Apoie o Movimento
+      </button>
+      <button
+        onClick={() => handleModalOpen('contact')}
+        className="text-gray-600 hover:text-blue-600 transition text-left py-2"
+      >
+        Contato
+      </button>
+    </nav>
+  )
+
+  return (
+    <>
+      {/* Botão do menu */}
+      <div className="fixed top-[4.5rem] left-4 z-[60] flex items-center">
         <button
-          className="fixed top-4 right-4 z-50 bg-white p-2 rounded-md shadow-md"
-          onClick={() => setIsMenuOpen(false)}
+          onClick={() => setIsOpen(!isOpen)}
+          className="p-2 rounded-lg bg-white shadow-md hover:bg-gray-100 transition"
+          aria-label="Toggle menu"
         >
-          <XMarkIcon className="h-6 w-6" />
+          <FiMenu size={24} />
         </button>
+      </div>
+
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-[45]"
+          onClick={() => setIsOpen(false)}
+        />
       )}
-    </div>
+
+      {/* Menu */}
+      <div
+        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-[50] transform transition-transform duration-300 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="h-20" /> {/* Espaço para o header */}
+        <button
+          onClick={() => setIsOpen(false)}
+          className="absolute top-24 right-4 p-2 text-gray-600 hover:text-blue-600 transition"
+          aria-label="Fechar menu"
+        >
+          <FiX size={24} />
+        </button>
+        {isAdminPage ? renderAdminMenu() : renderMainMenu()}
+      </div>
+    </>
   )
 }
 

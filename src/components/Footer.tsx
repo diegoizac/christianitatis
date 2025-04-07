@@ -1,14 +1,10 @@
-import React from "react";
-import SocialIcons from "./SocialIcons";
+import React from 'react'
+import SocialIcons from './SocialIcons'
 
-interface FooterProps {
-  setActiveModal: (modalId: string | null) => void;
-}
-
-const Footer: React.FC<FooterProps> = () => {
+const Footer: React.FC = () => {
   return (
     <footer
-      className="footer text-black py-6 fixed bottom-0 w-full"
+      className="footer text-black py-6 bg-white border-t border-gray-200 mt-auto"
       id="row-footer"
     >
       <div className="container mx-auto text-center">
@@ -21,14 +17,15 @@ const Footer: React.FC<FooterProps> = () => {
             href="https://2dlcompany.com.br"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#1f2937]"
+            className="text-[#1f2937] hover:text-blue-600 transition-colors"
           >
+            {' '}
             Feito com <span className="text-[#3b82f6]">💙</span> por 2DL Company
           </a>
         </p>
       </div>
     </footer>
-  );
-};
+  )
+}
 
-export default Footer;
+export default Footer

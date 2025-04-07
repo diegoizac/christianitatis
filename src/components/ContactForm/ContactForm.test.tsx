@@ -1,111 +1,170 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { ContactForm } from '.'
-import type { ContactFormData } from '.'
+import { toast } from 'react-toastify'
+import ContactForm from '.'
 
-describe('ContactForm', () => {
-  it('deve renderizar todos os campos obrigatórios', () => {
-    render(<ContactForm onSubmit={async () => {}} />)
+jest.mock('react-toastify')
 
-    expect(screen.getByLabelText(/nome completo/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/mensagem/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /enviar mensagem/i })).toBeInTheDocument()
+describe('ContactForm Component', () => {
+  const defaultProps = {
+    onSuccess: vi.fn(),
+    onError: vi.fn(),
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
   })
 
-  it('deve mostrar erro quando campos obrigatórios estão vazios', async () => {
-    render(<ContactForm onSubmit={async () => {}} />)
+  it('should render form fields', () => {
+    render(<ContactForm {...defaultProps} />)
 
-    const submitButton = screen.getByRole('button', { name: /enviar mensagem/i })
-    fireEvent.click(submitButton)
-
-    await waitFor(() => {
-      expect(screen.getByText(/nome é obrigatório/i)).toBeInTheDocument()
-      expect(screen.getByText(/email é obrigatório/i)).toBeInTheDocument()
-      expect(screen.getByText(/mensagem é obrigatória/i)).toBeInTheDocument()
-    })
+    expect(screen.getByTestId('name-input')).toBeInTheDocument()
+    expect(screen.getByTestId('email-input')).toBeInTheDocument()
+    expect(screen.getByTestId('phone-input')).toBeInTheDocument()
+    expect(screen.getByTestId('subject-input')).toBeInTheDocument()
+    expect(screen.getByTestId('message-input')).toBeInTheDocument()
+    expect(screen.getByTestId('submit-button')).toBeInTheDocument()
   })
 
-  it('deve mostrar erro quando email é inválido', async () => {
-    render(<ContactForm onSubmit={async () => {}} />)
+  it('should handle form submission with valid data', async () => {
+    render(<ContactForm {...defaultProps} />)
 
-    const emailInput = screen.getByLabelText(/email/i)
-    fireEvent.change(emailInput, { target: { value: 'email-invalido' } })
+    const nameInput = screen.getByTestId('name-input')
+    const emailInput = screen.getByTestId('email-input')
+    const phoneInput = screen.getByTestId('phone-input')
+    const messageInput = screen.getByTestId('message-input')
 
-    const submitButton = screen.getByRole('button', { name: /enviar mensagem/i })
-    fireEvent.click(submitButton)
+    fireEvent.change(nameInput, { target: { value: 'John Doe' } })
+    fireEvent.change(emailInput, { target: { value: 'john@example.com' } })
+    fireEvent.change(phoneInput, { target: { value: '1234567890' } })
+    fireEvent.change(messageInput, { target: { value: 'Test message' } })
 
-    await waitFor(() => {
-      expect(screen.getByText(/email inválido/i)).toBeInTheDocument()
-    })
-  })
-
-  it('deve chamar onSubmit com dados válidos', async () => {
-    const onSubmitMock = vi.fn<[ContactFormData], Promise<void>>(async () => {})
-    render(<ContactForm onSubmit={onSubmitMock} />)
-
-    fireEvent.change(screen.getByLabelText(/nome completo/i), {
-      target: { value: 'João Silva' },
-    })
-    fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: 'joao@exemplo.com' },
-    })
-    fireEvent.change(screen.getByLabelText(/mensagem/i), {
-      target: { value: 'Olá mundo!' },
-    })
-
-    const submitButton = screen.getByRole('button', { name: /enviar mensagem/i })
-    fireEvent.click(submitButton)
+    fireEvent.click(screen.getByTestId('submit-button'))
 
     await waitFor(() => {
-      expect(onSubmitMock).toHaveBeenCalledWith({
-        name: 'João Silva',
-        email: 'joao@exemplo.com',
-        phone: '',
-        subject: '',
-        message: 'Olá mundo!',
-      })
+      expect(toast.success).toHaveBeenCalledWith('Mensagem enviada com sucesso!')
+      expect(defaultProps.onSuccess).toHaveBeenCalled()
     })
   })
 
-  it('deve desabilitar o botão durante o envio', async () => {
-    const onSubmitMock = vi.fn<[ContactFormData], Promise<void>>(
-      () => new Promise(resolve => setTimeout(resolve, 1000))
-    )
-    render(<ContactForm onSubmit={onSubmitMock} />)
+  it('should handle submission error', async () => {
+    const error = 'Erro ao enviar mensagem. Tente novamente.'
 
-    fireEvent.change(screen.getByLabelText(/nome completo/i), {
-      target: { value: 'João Silva' },
-    })
-    fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: 'joao@exemplo.com' },
-    })
-    fireEvent.change(screen.getByLabelText(/mensagem/i), {
-      target: { value: 'Olá mundo!' },
-    })
+    // Mock the Promise.resolve to reject
+    vi.spyOn(Promise, 'resolve').mockImplementationOnce(() => Promise.reject())
 
-    const submitButton = screen.getByRole('button', { name: /enviar mensagem/i })
-    fireEvent.click(submitButton)
+    render(<ContactForm {...defaultProps} />)
 
-    expect(submitButton).toBeDisabled()
+    const nameInput = screen.getByTestId('name-input')
+    const emailInput = screen.getByTestId('email-input')
+    const messageInput = screen.getByTestId('message-input')
+
+    fireEvent.change(nameInput, { target: { value: 'John Doe' } })
+    fireEvent.change(emailInput, { target: { value: 'john@example.com' } })
+    fireEvent.change(messageInput, { target: { value: 'Test message' } })
+
+    fireEvent.click(screen.getByTestId('submit-button'))
 
     await waitFor(() => {
-      expect(submitButton).not.toBeDisabled()
+      expect(toast.error).toHaveBeenCalledWith(error)
     })
+  })
+
+  it('should validate required fields', () => {
+    render(<ContactForm {...defaultProps} />)
+
+    fireEvent.click(screen.getByTestId('submit-button'))
+
+    expect(screen.getByTestId('name-input')).toBeInvalid()
+    expect(screen.getByTestId('email-input')).toBeInvalid()
+    expect(screen.getByTestId('subject-input')).toBeInvalid()
+    expect(screen.getByTestId('message-input')).toBeInvalid()
+  })
+
+  it('should validate email format', () => {
+    render(<ContactForm {...defaultProps} />)
+
+    const emailInput = screen.getByTestId('email-input')
+    fireEvent.change(emailInput, { target: { value: 'invalid-email' } })
+
+    expect(emailInput).toBeInvalid()
+  })
+
+  it('should show validation errors for empty fields', async () => {
+    render(<ContactForm {...defaultProps} />)
+
+    fireEvent.click(screen.getByTestId('submit-button'))
+
+    expect(screen.getByText('Nome é obrigatório')).toBeInTheDocument()
+    expect(screen.getByText('Email é obrigatório')).toBeInTheDocument()
+    expect(screen.getByText('Mensagem é obrigatória')).toBeInTheDocument()
+  })
+
+  it('should show error for invalid email', async () => {
+    render(<ContactForm {...defaultProps} />)
+
+    const emailInput = screen.getByTestId('email-input')
+    fireEvent.change(emailInput, { target: { value: 'invalid-email' } })
+
+    fireEvent.click(screen.getByTestId('submit-button'))
+
+    expect(screen.getByText('Email inválido')).toBeInTheDocument()
+  })
+
+  it('should clear form after successful submission', async () => {
+    render(<ContactForm {...defaultProps} />)
+
+    const nameInput = screen.getByTestId('name-input')
+    const emailInput = screen.getByTestId('email-input')
+    const messageInput = screen.getByTestId('message-input')
+
+    fireEvent.change(nameInput, { target: { value: 'John Doe' } })
+    fireEvent.change(emailInput, { target: { value: 'john@example.com' } })
+    fireEvent.change(messageInput, { target: { value: 'Test message' } })
+
+    fireEvent.click(screen.getByTestId('submit-button'))
+
+    expect(nameInput).toHaveValue('')
+    expect(emailInput).toHaveValue('')
+    expect(messageInput).toHaveValue('')
   })
 
   it('deve renderizar campos opcionais', () => {
-    render(<ContactForm onSubmit={async () => {}} />)
+    render(<ContactForm {...defaultProps} />)
 
-    expect(screen.getByLabelText(/telefone/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/assunto/i)).toBeInTheDocument()
+    expect(screen.getByTestId('phone-input')).toBeInTheDocument()
+    expect(screen.getByTestId('subject-input')).toBeInTheDocument()
   })
 
   it('deve renderizar opções de contato alternativas', () => {
-    render(<ContactForm onSubmit={async () => {}} />)
+    render(<ContactForm {...defaultProps} />)
 
     expect(screen.getByText(/você também pode nos contatar através de:/i)).toBeInTheDocument()
     expect(screen.getByText(/contato@christianitatis.com/i)).toBeInTheDocument()
     expect(screen.getByText(/\(11\) 99999-9999/i)).toBeInTheDocument()
+  })
+
+  it('disables submit button while submitting', async () => {
+    render(<ContactForm {...defaultProps} />)
+
+    const nameInput = screen.getByTestId('name-input')
+    const emailInput = screen.getByTestId('email-input')
+    const phoneInput = screen.getByTestId('phone-input')
+    const messageInput = screen.getByTestId('message-input')
+
+    fireEvent.change(nameInput, { target: { value: 'John Doe' } })
+    fireEvent.change(emailInput, { target: { value: 'john@example.com' } })
+    fireEvent.change(phoneInput, { target: { value: '1234567890' } })
+    fireEvent.change(messageInput, { target: { value: 'Test Message' } })
+
+    fireEvent.click(screen.getByTestId('submit-button'))
+
+    expect(screen.getByTestId('submit-button')).toBeDisabled()
+    expect(screen.getByTestId('submit-button')).toHaveTextContent('Enviando...')
+
+    await waitFor(() => {
+      expect(screen.getByTestId('submit-button')).not.toBeDisabled()
+      expect(screen.getByTestId('submit-button')).toHaveTextContent('Enviar Mensagem')
+    })
   })
 })

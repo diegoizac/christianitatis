@@ -1,42 +1,40 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React from 'react'
+import { supabase } from '@/lib/supabase'
+import type { User, Session } from '@supabase/supabase-js'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
-import { User, Session } from '@supabase/supabase-js'
+import { toast } from 'react-toastify'
 
 interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
-  error: Error | null
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, name: string) => Promise<void>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<void>
-  updateProfile: (data: { full_name?: string; avatar_url?: string }) => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = React.createContext<AuthContextType | undefined>(undefined)
 
-export const useAuth = () => {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider')
-  }
-  return context
-}
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = React.useState<User | null>(null)
+  const [session, setSession] = React.useState<Session | null>(null)
+  const [loading, setLoading] = React.useState(true)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    checkUser()
+  React.useEffect(() => {
+    // Verificar sessão atual
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
+
+    // Escutar mudanças de auth
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
     })
@@ -44,44 +42,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe()
   }, [])
 
-  async function checkUser() {
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
-      setSession(session)
-      setLoading(false)
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error'))
-      setLoading(false)
-    }
-  }
-
   const signIn = async (email: string, password: string) => {
     try {
-      setLoading(true)
-      setError(null)
-
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
       if (error) throw error
 
-      // Removido o navigate daqui pois será feito no AuthModal
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error'
-      setError(new Error(message))
-    } finally {
-      setLoading(false)
+      toast.success('Login realizado com sucesso!')
+      navigate('/dashboard')
+    } catch (error) {
+      toast.error('Erro ao fazer login. Verifique suas credenciais.')
+      console.error('Erro no login:', error)
     }
   }
 
   const signUp = async (email: string, password: string, name: string) => {
     try {
-      setLoading(true)
-      setError(null)
-
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -91,86 +71,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       })
 
-      if (signUpError) throw signUpError
-
-      // Removido o navigate daqui pois será feito no AuthModal
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error'
-      setError(new Error(message))
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const resetPassword = async (email: string) => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      })
-
       if (error) throw error
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error'
-      setError(new Error(message))
-    } finally {
-      setLoading(false)
+
+      toast.success('Cadastro realizado! Verifique seu email.')
+      navigate('/login')
+    } catch (error) {
+      toast.error('Erro ao criar conta. Tente novamente.')
+      console.error('Erro no cadastro:', error)
     }
   }
 
   const signOut = async () => {
     try {
-      setLoading(true)
-      setError(null)
-
       const { error } = await supabase.auth.signOut()
-
       if (error) throw error
 
-      navigate('/')
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error'
-      setError(new Error(message))
-    } finally {
-      setLoading(false)
+      toast.success('Logout realizado com sucesso!')
+      navigate('/login')
+    } catch (error) {
+      toast.error('Erro ao fazer logout.')
+      console.error('Erro no logout:', error)
     }
   }
 
-  const updateProfile = async (data: { full_name?: string; avatar_url?: string }) => {
+  const resetPassword = async (email: string) => {
     try {
-      setLoading(true)
-      setError(null)
-
-      const { error } = await supabase.auth.updateUser({
-        data,
-      })
-
+      const { error } = await supabase.auth.resetPasswordForEmail(email)
       if (error) throw error
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error'
-      setError(new Error(message))
-    } finally {
-      setLoading(false)
+
+      toast.success('Email de recuperação enviado!')
+    } catch (error) {
+      toast.error('Erro ao enviar email de recuperação.')
+      console.error('Erro na recuperação de senha:', error)
     }
   }
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        session,
-        loading,
-        error,
-        signIn,
-        signUp,
-        signOut,
-        resetPassword,
-        updateProfile,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  )
+  const value = {
+    user,
+    session,
+    loading,
+    signIn,
+    signUp,
+    signOut,
+    resetPassword,
+  }
+
+  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>
+}
+
+export function useAuth() {
+  const context = React.useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider')
+  }
+  return context
 }

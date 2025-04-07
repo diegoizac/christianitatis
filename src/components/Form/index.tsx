@@ -122,7 +122,7 @@ export function Form<T>({ children, config, onSubmit, className, ...props }: For
   }
 
   return (
-    <form noValidate onSubmit={handleFormSubmit} className={className} {...props}>
+    <form noValidate onSubmit={handleFormSubmit} className={className} role="form" {...props}>
       {renderChildren()}
     </form>
   )

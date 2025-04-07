@@ -5,17 +5,51 @@
 /* Seus estilos customizados aqui */
 
 :root {
-  --primary-color: #3b82f6; /* Example, adjust as needed */
+  --primary-color: #3b82f6;
+  --primary-50: #f0f9ff;
+  --primary-100: #e0f2fe;
+  --primary-200: #bae6fd;
+  --primary-300: #7dd3fc;
+  --primary-400: #38bdf8;
+  --primary-500: #0ea5e9;
+  --primary-600: #0284c7;
+  --primary-700: #0369a1;
+  --primary-800: #075985;
+  --primary-900: #0c4a6e;
+  --primary-950: #082f49;
+
   /* Jeton-inspired colors */
-  --jeton-bg: #f3f4f6; /* Light gray background */
-  --jeton-text: #1f2937; /* Dark gray text */
-  --jeton-hover: #1e40af; /* Darker blue for hover */
+  --jeton-bg: #ffffff;
+  --jeton-text: #1f2937;
+  --jeton-primary: #3b82f6;
+  --jeton-secondary: #6b7280;
+  --jeton-accent: #f59e0b;
+
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+}
+
+/* Estilos globais para remover scroll */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 body {
-  font-family: "Inter", sans-serif; /* Use a similar font to Jeton */
+  margin: 0;
+  padding: 0;
+  background-color: var(--jeton-bg);
   color: var(--jeton-text);
-  background-color: #f3f4f6; /* Cor de fundo da animação */
+  overflow-x: hidden;
+  font-family: 'Inter', sans-serif; /* Use a similar font to Jeton */
 }
 
 /* Header Styles - Keep your existing header styles, adjust if needed */
@@ -26,11 +60,11 @@ body {
   width: 100%;
   padding: 1rem;
   z-index: 100;
-  background-color: #f3f4f6; /* Cor de fundo da animação */
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .header.scrolled {
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.95);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -73,7 +107,9 @@ body {
 .language-option {
   padding: 0.75rem 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease, padding-left 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    padding-left 0.2s ease;
 }
 
 .language-option:hover {
@@ -138,7 +174,7 @@ body {
   vertical-align: middle;
 }
 
-/* Modal Styles - Keep, adjust if needed */
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -146,30 +182,37 @@ body {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
 }
 
 .modal-overlay.active {
   opacity: 1;
   visibility: visible;
+  display: flex;
+  pointer-events: auto;
 }
 
 .modal-content {
-  background-color: #f3f4f6; /* Cor de fundo da animação */
+  background-color: white;
   border-radius: 8px;
   padding: 2rem;
   max-height: 90vh;
   overflow-y: auto;
   transform: scale(0.9);
   transition: transform 0.3s ease;
-  max-width: 80%; /* Add max-width */
+  max-width: 80%;
   width: auto;
+  position: relative;
+  z-index: 1001;
+  pointer-events: auto;
 }
 
 @media (max-width: 767px) {
@@ -187,16 +230,18 @@ body {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: none;
+  background: transparent;
   border: none;
-  font-size: 1.5rem;
   cursor: pointer;
-  color: #6b7280;
+  padding: 0.5rem;
+  color: #4b5563;
   transition: color 0.2s ease;
+  z-index: 1002;
+  pointer-events: auto;
 }
 
 .modal-close:hover {
-  color: #111827;
+  color: #1f2937;
 }
 
 .modal-content-inner {
@@ -248,30 +293,53 @@ body {
 .fade-in {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .slide-in-left {
   opacity: 0;
   transform: translateX(-50px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+}
+
+.slide-in-left.visible {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .slide-in-right {
   opacity: 0;
   transform: translateX(50px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+}
+
+.slide-in-right.visible {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .scale-in {
   opacity: 0;
-  transform: scale(0.8);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: scale(0.9);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
 }
 
-.visible {
+.scale-in.visible {
   opacity: 1;
-  transform: translate(0) scale(1);
+  transform: scale(1);
 }
 
 /* Overlay for gallery items */
@@ -325,7 +393,9 @@ body {
 
 /* Social icons hover effect */
 .social-icons a {
-  transition: transform 0.3s ease, color 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease;
 }
 
 .social-icons a:hover {
@@ -359,5 +429,30 @@ body {
 
 /* Garantir que os ícones do Font Awesome usem a fonte correta */
 .fab {
-  font-family: "Font Awesome 6 Brands" !important;
+  font-family: 'Font Awesome 6 Brands' !important;
+}
+
+/* Utility Classes */
+.bg-primary-600 {
+  background-color: var(--primary-600);
+}
+
+.hover\:bg-primary-700:hover {
+  background-color: var(--primary-700);
+}
+
+.text-primary-600 {
+  color: var(--primary-600);
+}
+
+.hover\:text-primary-500:hover {
+  color: var(--primary-500);
+}
+
+.focus\:border-primary-500:focus {
+  border-color: var(--primary-500);
+}
+
+.focus\:ring-primary-500:focus {
+  --tw-ring-color: var(--primary-500);
 }

@@ -76,6 +76,7 @@ describe('Form Component', () => {
       <Form config={formConfig} onSubmit={handleSubmit}>
         <Input name="email" placeholder="Email" />
         <Input name="password" type="password" placeholder="Senha" />
+        <Input name="testField" placeholder="Test Field" />
         <button type="submit">Enviar</button>
       </Form>
     )
@@ -85,14 +86,17 @@ describe('Form Component', () => {
 
     const emailInput = screen.getByPlaceholderText('Email')
     const passwordInput = screen.getByPlaceholderText('Senha')
+    const testFieldInput = screen.getByPlaceholderText('Test Field')
 
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
     fireEvent.change(passwordInput, { target: { value: '123456' } })
+    fireEvent.change(testFieldInput, { target: { value: 'test value' } })
     fireEvent.click(screen.getByText('Enviar'))
 
     expect(handleSubmit).toHaveBeenCalledWith({
       email: 'test@example.com',
       password: '123456',
+      testField: 'test value',
     })
   })
 

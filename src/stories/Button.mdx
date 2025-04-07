@@ -1,0 +1,97 @@
+import { Meta, Primary, Controls, Story } from '@storybook/blocks'
+import * as ButtonStories from './Button.stories'
+
+<Meta of={ButtonStories} />
+
+# Botão
+
+## Descrição
+
+O componente Botão é um elemento fundamental da interface, projetado para ser altamente reutilizável, acessível e personalizável.
+
+## Uso Básico
+
+```tsx
+import { Button } from '@/components'
+
+export default function Example() {
+  return <Button variant="primary">Clique Aqui</Button>
+}
+```
+
+## Variações
+
+O botão possui três variações principais:
+
+### Botão Primário
+
+Usado para ações principais e de maior destaque na interface.
+
+<Primary />
+
+### Botão Secundário
+
+Para ações secundárias ou alternativas.
+
+<Story of={ButtonStories.Secundário} />
+
+### Botão com Contorno
+
+Ideal para ações terciárias ou quando se deseja um visual mais sutil.
+
+<Story of={ButtonStories.Contorno} />
+
+## Props
+
+<Controls />
+
+## Acessibilidade
+
+O componente Button foi desenvolvido seguindo as melhores práticas de acessibilidade:
+
+- ✅ Suporte completo a navegação por teclado
+- ✅ Estados focáveis claramente visíveis
+- ✅ Atributos ARIA apropriados
+- ✅ Alto contraste nas cores
+- ✅ Feedback visual ao interagir
+
+## Boas Práticas
+
+- Use o botão primário apenas para a ação principal da tela
+- Mantenha textos curtos e objetivos
+- Evite usar mais de um botão primário por seção
+- Prefira o botão secundário para ações destrutivas
+- Use o botão outline para ações opcionais
+
+## Estados
+
+O botão possui diferentes estados para melhor feedback ao usuário:
+
+### Desabilitado
+
+Quando a ação não está disponível.
+
+<Story of={ButtonStories.Desabilitado} />
+
+## Testes
+
+Cenários importantes para teste:
+
+- Clique funciona corretamente
+- Estado desabilitado previne interações
+- Feedback visual ao focar
+- Navegação por teclado
+- Cores tem contraste adequado
+
+## Notas de Desenvolvimento
+
+- Construído com Tailwind CSS para estilização
+- Usa o sistema de cores do tema
+- Suporta customização via className
+- Implementa padrões de acessibilidade WCAG 2.1
+
+## Changelog
+
+| Versão | Mudanças              | Autor | Data       |
+| ------ | --------------------- | ----- | ---------- |
+| 1.0.0  | Implementação inicial | Diêgo | 04/04/2024 |

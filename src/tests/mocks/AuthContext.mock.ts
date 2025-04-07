@@ -1,0 +1,38 @@
+import { vi } from 'vitest'
+import { createContext } from 'react'
+
+export const mockUser = {
+  id: '123',
+  email: 'test@example.com',
+  profile: {
+    username: 'testuser',
+    full_name: 'Test User',
+    role: 'user',
+    avatar_url: null,
+    diocese: null,
+    paroquia: null
+  }
+}
+
+export const mockAuthContext = {
+  user: mockUser,
+  loading: false,
+  error: null,
+  login: vi.fn(),
+  logout: vi.fn(),
+  register: vi.fn(),
+  updateProfile: vi.fn(),
+  resetPassword: vi.fn()
+}
+
+export const AuthContext = createContext(mockAuthContext)
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <AuthContext.Provider value={mockAuthContext}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export const useAuth = () => mockAuthContext 

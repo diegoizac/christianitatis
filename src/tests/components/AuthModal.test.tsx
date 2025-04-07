@@ -18,9 +18,9 @@ vi.mock('react-toastify', () => ({
 vi.mock('../../contexts/AuthContext', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useAuth: () => ({
-    signIn: vi.fn().mockImplementation(email => {
-      if (email === 'invalid@example.com') {
-        throw new Error('Credenciais inválidas')
+    signIn: vi.fn().mockImplementation((email, password) => {
+      if (email === 'test@example.com' && password === 'password123') {
+        return Promise.reject(new Error('Credenciais inválidas'))
       }
       return Promise.resolve()
     }),

@@ -1,0 +1,94 @@
+import { Meta } from '@storybook/blocks'
+
+{/* ComponentTemplate.mdx */}
+
+<Meta title="Templates/Documentação de Componente" />
+
+# Template de Documentação
+
+## Estrutura Básica
+
+```mdx
+import { Meta, Primary, Controls } from '@storybook/blocks'
+import * as Stories from './SeuComponente.stories'
+
+<Meta of={Stories} />
+
+# Nome do Componente
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Descrição
+
+Descreva o componente aqui.
+
+## Uso
+
+\`\`\`tsx
+import { SeuComponente } from '@/components'
+
+export default function Example() {
+  return <SeuComponente>Conteúdo</SeuComponente>
+}
+\`\`\`
+
+## Variações
+
+### Variação 1
+
+Descrição da primeira variação
+
+### Variação 2
+
+Descrição da segunda variação
+
+## Acessibilidade
+
+- [ ] Suporte a teclado
+- [ ] Roles ARIA
+- [ ] Estados focáveis
+- [ ] Mensagens de erro acessíveis
+
+## Boas Práticas
+
+- Lista de boas práticas
+- Casos de uso recomendados
+- O que evitar
+
+## Testes
+
+- Cenários de teste
+- Comportamentos esperados
+- Casos de borda
+
+## Notas de Desenvolvimento
+
+- Decisões técnicas
+- Dependências
+- Limitações
+
+## Changelog
+
+| Versão | Mudanças       | Autor | Data |
+| ------ | -------------- | ----- | ---- |
+| 1.0.0  | Versão inicial | -     | -    |
+```
+
+## Como Usar Este Template
+
+1. Copie este template para seu novo arquivo MDX
+2. Substitua as seções com seu conteúdo
+3. Remova as seções que não se aplicam
+4. Adicione exemplos específicos do seu componente
+
+## Dicas
+
+- Mantenha a documentação clara e concisa
+- Use exemplos práticos
+- Inclua casos de uso comuns
+- Documente props importantes
+- Mencione dependências necessárias

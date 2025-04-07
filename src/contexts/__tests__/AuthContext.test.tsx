@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { vi } from 'vitest'
 import { AuthProvider, useAuth } from '../AuthContext'
 import { createClient } from '@supabase/supabase-js'
+import { MemoryRouter } from 'react-router-dom'
 
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => ({
@@ -39,17 +40,21 @@ const TestComponent = () => {
   )
 }
 
+const renderWithRouter = (component: React.ReactNode) => {
+  return render(
+    <MemoryRouter>
+      <AuthProvider>{component}</AuthProvider>
+    </MemoryRouter>
+  )
+}
+
 describe('AuthContext', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it('should handle successful login', async () => {
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    )
+    renderWithRouter(<TestComponent />)
 
     fireEvent.click(screen.getByText('Sign In'))
 
@@ -64,11 +69,7 @@ describe('AuthContext', () => {
       new Error('Invalid credentials')
     )
 
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    )
+    renderWithRouter(<TestComponent />)
 
     fireEvent.click(screen.getByText('Sign In'))
 
@@ -78,11 +79,7 @@ describe('AuthContext', () => {
   })
 
   it('should handle successful registration', async () => {
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    )
+    renderWithRouter(<TestComponent />)
 
     fireEvent.click(screen.getByText('Sign Up'))
 
@@ -95,11 +92,7 @@ describe('AuthContext', () => {
     const mockClient = createClient('', '')
     vi.mocked(mockClient.auth.signUp).mockRejectedValueOnce(new Error('Email already exists'))
 
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    )
+    renderWithRouter(<TestComponent />)
 
     fireEvent.click(screen.getByText('Sign Up'))
 
@@ -109,11 +102,7 @@ describe('AuthContext', () => {
   })
 
   it('should handle sign out', async () => {
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    )
+    renderWithRouter(<TestComponent />)
 
     fireEvent.click(screen.getByText('Sign Out'))
 

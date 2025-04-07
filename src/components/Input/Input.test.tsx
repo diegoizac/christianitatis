@@ -92,4 +92,66 @@ describe('Input Component', () => {
     render(<Input variant="outline" />)
     expect(screen.getByRole('textbox').parentElement).toHaveClass('focus-within:ring-2')
   })
+
+  it('should render input with label', () => {
+    render(<Input label="Test Label" name="test" />)
+    expect(screen.getByLabelText('Test Label')).toBeInTheDocument()
+  })
+
+  it('should handle value changes', () => {
+    const onChange = vi.fn()
+    render(<Input name="test" onChange={onChange} />)
+
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, { target: { value: 'test value' } })
+    expect(onChange).toHaveBeenCalled()
+  })
+
+  it('should display error message', () => {
+    render(<Input name="test" error="Test error message" />)
+    expect(screen.getByText('Test error message')).toBeInTheDocument()
+  })
+
+  it('should apply custom className', () => {
+    render(<Input name="test" className="custom-class" />)
+    expect(screen.getByRole('textbox')).toHaveClass('custom-class')
+  })
+
+  it('should handle disabled state', () => {
+    render(<Input name="test" disabled />)
+    expect(screen.getByRole('textbox')).toBeDisabled()
+  })
+
+  it('should handle readonly state', () => {
+    render(<Input name="test" readOnly />)
+    expect(screen.getByRole('textbox')).toHaveAttribute('readonly')
+  })
+
+  it('should handle required state', () => {
+    render(<Input name="test" required />)
+    expect(screen.getByRole('textbox')).toBeRequired()
+  })
+
+  it('should handle placeholder', () => {
+    render(<Input name="test" placeholder="Test placeholder" />)
+    expect(screen.getByPlaceholderText('Test placeholder')).toBeInTheDocument()
+  })
+
+  it('should handle different types', () => {
+    render(<Input name="test" type="password" />)
+    expect(screen.getByLabelText('test')).toHaveAttribute('type', 'password')
+  })
+
+  it('should handle focus and blur events', () => {
+    const onFocus = vi.fn()
+    const onBlur = vi.fn()
+    render(<Input name="test" onFocus={onFocus} onBlur={onBlur} />)
+
+    const input = screen.getByRole('textbox')
+    fireEvent.focus(input)
+    expect(onFocus).toHaveBeenCalled()
+
+    fireEvent.blur(input)
+    expect(onBlur).toHaveBeenCalled()
+  })
 })
