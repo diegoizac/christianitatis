@@ -1,136 +1,164 @@
-import React, { useEffect, useRef } from "react";
-import * as THREE from "three";
+import React, { useEffect, useRef } from 'react'
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
+
+interface LoadingProgress {
+  loaded: number
+  total: number
+}
 
 const CenteredThreeScene: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mouse = new THREE.Vector2();
-  const raycaster = new THREE.Raycaster();
-  const spheresRef = useRef<THREE.Mesh[]>([]);
+  const mountRef = useRef<HTMLDivElement>(null)
+  const sceneRef = useRef<THREE.Scene | null>(null)
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
+  const controlsRef = useRef<OrbitControls | null>(null)
+  const modelRef = useRef<THREE.Group | null>(null)
+  const frameIdRef = useRef<number>(0)
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!mountRef.current) return
 
-    // Scene setup
-    const scene = new THREE.Scene();
+    // Configuração da cena
+    const scene = new THREE.Scene()
+    sceneRef.current = scene
+    scene.background = new THREE.Color(0xf3f4f6)
+
+    // Configuração da câmera
     const camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
       0.1,
       1000
-    );
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    containerRef.current.appendChild(renderer.domElement);
-    renderer.setClearColor(0x000000, 0);
+    )
+    cameraRef.current = camera
+    camera.position.set(0, 2, 5)
 
-    const ambientLight = new THREE.AmbientLight(0x404040);
-    scene.add(ambientLight);
+    // Configuração do renderer
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance',
+    })
+    rendererRef.current = renderer
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)) // Limita para melhor performance
+    renderer.outputColorSpace = THREE.SRGBColorSpace // Substitui outputEncoding
+    renderer.shadowMap.enabled = true
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    mountRef.current.appendChild(renderer.domElement)
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(1, 1, 1);
-    scene.add(directionalLight);
+    // Adicionar OrbitControls
+    const controls = new OrbitControls(camera, renderer.domElement)
+    controlsRef.current = controls
+    controls.enableDamping = true
+    controls.dampingFactor = 0.05
+    controls.rotateSpeed = 0.5
+    controls.enableZoom = true
+    controls.minDistance = 3
+    controls.maxDistance = 10
+    controls.target.set(0, 0, 0)
 
-    const geometries = [
-      new THREE.SphereGeometry(1, 32, 32),
-      new THREE.SphereGeometry(0.8, 24, 24),
-      new THREE.SphereGeometry(0.5, 16, 16),
-    ];
-    const materials = [
-      new THREE.MeshPhongMaterial({
-        color: 0xffd700,
-        specular: 0xffffff,
-        shininess: 100,
-      }), // Gold
-      new THREE.MeshPhongMaterial({
-        color: 0x1e90ff,
-        specular: 0xffffff,
-        shininess: 100,
-      }), // Dodger Blue
-      new THREE.MeshPhongMaterial({
-        color: 0x32cd32,
-        specular: 0xffffff,
-        shininess: 100,
-      }), // Lime Green
-    ];
+    // Luzes
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+    scene.add(ambientLight)
 
-    const spheres: THREE.Mesh[] = [];
-    for (let i = 0; i < 3; i++) {
-      const sphere = new THREE.Mesh(geometries[i], materials[i]);
-      sphere.position.x = (i - 1) * 2;
-      scene.add(sphere);
-      spheres.push(sphere);
-    }
-    spheresRef.current = spheres;
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
+    directionalLight.position.set(5, 5, 5)
+    directionalLight.castShadow = true
+    directionalLight.shadow.mapSize.width = 1024
+    directionalLight.shadow.mapSize.height = 1024
+    scene.add(directionalLight)
 
-    camera.position.z = 5;
+    const backLight = new THREE.DirectionalLight(0xffffff, 0.5)
+    backLight.position.set(-5, 5, -5)
+    scene.add(backLight)
 
-    // Mouse move handler
-    const onMouseMove = (event: MouseEvent) => {
-      event.preventDefault();
+    // Carregar o modelo GLB
+    const loader = new GLTFLoader()
+    loader.load(
+      '/src/assets/animations/arvore-logo-3d-christianitatisv0001.glb',
+      (gltf: GLTF) => {
+        const model = gltf.scene
+        modelRef.current = model
 
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        // Habilitar sombras para todos os objetos do modelo
+        model.traverse(node => {
+          if (node instanceof THREE.Mesh) {
+            node.castShadow = true
+            node.receiveShadow = true
+          }
+        })
 
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(spheresRef.current);
+        // Centralizar o modelo
+        const box = new THREE.Box3().setFromObject(model)
+        const center = box.getCenter(new THREE.Vector3())
+        model.position.sub(center)
 
-      // Reset emissive color for all spheres
-      spheresRef.current.forEach((sphere) => {
-        (sphere.material as THREE.MeshPhongMaterial).emissive.setHex(0x000000);
-      });
+        // Ajustar escala se necessário
+        const scale = 1.5
+        model.scale.set(scale, scale, scale)
 
-      // Highlight intersected sphere
-      if (intersects.length > 0) {
-        const intersected = intersects[0].object as THREE.Mesh;
-        (intersected.material as THREE.MeshPhongMaterial).emissive.setHex(
-          0x555555
-        ); // Make it glow
+        scene.add(model)
+
+        // Ajustar controles para o centro do modelo
+        controls.target.copy(model.position)
+        controls.update()
+      },
+      (progress: LoadingProgress) => {
+        console.log('Loading model:', (progress.loaded / progress.total) * 100 + '%')
+      },
+      (error: unknown) => {
+        console.error('Error loading model:', error)
       }
-    };
+    )
 
-    // Add mouse move listener
-    window.addEventListener("mousemove", onMouseMove, false);
-
+    // Função de animação
     const animate = () => {
-      requestAnimationFrame(animate);
+      frameIdRef.current = requestAnimationFrame(animate)
 
-      spheresRef.current.forEach((sphere) => {
-        sphere.rotation.x += 0.01;
-        sphere.rotation.y += 0.01;
-      });
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
-    const handleResize = () => {
-      if (!containerRef.current) return;
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      renderer.setSize(width, height);
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-    };
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousemove", onMouseMove);
-      if (containerRef.current) {
-        containerRef.current.removeChild(renderer.domElement);
+      if (modelRef.current) {
+        modelRef.current.rotation.y += 0.002
       }
-      geometries.forEach((geometry) => geometry.dispose());
-      materials.forEach((material) => material.dispose());
-    };
-  }, []);
 
-  return (
-    <div
-      ref={containerRef}
-      className="w-full h-full flex items-center justify-center"
-    ></div>
-  );
-};
+      controls.update()
+      renderer.render(scene, camera)
+    }
 
-export default CenteredThreeScene;
+    animate()
+
+    // Ajustar tamanho ao redimensionar a janela
+    const handleResize = () => {
+      if (!mountRef.current || !camera || !renderer) return
+
+      const width = window.innerWidth
+      const height = window.innerHeight
+
+      camera.aspect = width / height
+      camera.updateProjectionMatrix()
+      renderer.setSize(width, height)
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(frameIdRef.current)
+
+      if (mountRef.current && rendererRef.current) {
+        mountRef.current.removeChild(rendererRef.current.domElement)
+      }
+
+      if (rendererRef.current) {
+        rendererRef.current.dispose()
+      }
+    }
+  }, [])
+
+  return <div ref={mountRef} className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }} />
+}
+
+export default CenteredThreeScene
