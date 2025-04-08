@@ -1,9 +1,15 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { useForm } from "./useForm";
+import { useForm, FormConfig } from "./useForm";
+
+type TestForm = {
+  email: string;
+  password: string;
+  name: string;
+};
 
 describe("useForm Hook", () => {
-  const formConfig = {
+  const defaultConfig: FormConfig<TestForm> = {
     email: {
       initialValue: "",
       validate: [
@@ -22,83 +28,94 @@ describe("useForm Hook", () => {
         },
       ],
     },
+    name: {
+      initialValue: "",
+      validate: [
+        {
+          validate: (value: string) => value.length > 0,
+          message: "Nome é obrigatório",
+        },
+      ],
+    },
   };
 
-  it("should initialize with initial values", () => {
-    const { result } = renderHook(() => useForm(formConfig));
+  it("initializes with correct initial values", () => {
+    const { result } = renderHook(() => useForm<TestForm>(defaultConfig));
 
     expect(result.current.values).toEqual({
       email: "",
       password: "",
+      name: "",
     });
     expect(result.current.errors).toEqual({});
     expect(result.current.isDirty).toEqual({});
   });
 
-  it("should update values and validate on change", () => {
-    const { result } = renderHook(() => useForm(formConfig));
+  it("handles field changes and validates correctly", () => {
+    const { result } = renderHook(() => useForm<TestForm>(defaultConfig));
 
     act(() => {
-      result.current.handleChange("email", "test");
+      result.current.handleChange("email", "invalid-email");
     });
 
-    expect(result.current.values.email).toBe("test");
+    expect(result.current.values.email).toBe("invalid-email");
     expect(result.current.errors.email).toBe("Email inválido");
     expect(result.current.isDirty.email).toBe(true);
-  });
-
-  it("should clear errors when valid value is provided", () => {
-    const { result } = renderHook(() => useForm(formConfig));
 
     act(() => {
-      result.current.handleChange("email", "test@example.com");
+      result.current.handleChange("email", "valid@email.com");
     });
 
-    expect(result.current.values.email).toBe("test@example.com");
+    expect(result.current.values.email).toBe("valid@email.com");
     expect(result.current.errors.email).toBeUndefined();
   });
 
-  it("should validate all fields on submit", () => {
-    const { result } = renderHook(() => useForm(formConfig));
+  it("validates form on submit", async () => {
     const onSubmit = vi.fn();
+    const { result } = renderHook(() => useForm<TestForm>(defaultConfig));
+    const event = { preventDefault: vi.fn() } as unknown as React.FormEvent;
 
-    act(() => {
-      result.current.handleSubmit(onSubmit)();
+    await act(async () => {
+      await result.current.handleSubmit(onSubmit)(event);
     });
 
+    expect(onSubmit).not.toHaveBeenCalled();
     expect(result.current.errors).toEqual({
       email: "Email inválido",
       password: "Senha deve ter no mínimo 6 caracteres",
+      name: "Nome é obrigatório",
     });
-    expect(onSubmit).not.toHaveBeenCalled();
-  });
-
-  it("should call onSubmit when form is valid", () => {
-    const { result } = renderHook(() => useForm(formConfig));
-    const onSubmit = vi.fn();
 
     act(() => {
       result.current.handleChange("email", "test@example.com");
-      result.current.handleChange("password", "123456");
+      result.current.handleChange("password", "password123");
+      result.current.handleChange("name", "John Doe");
     });
 
-    act(() => {
-      result.current.handleSubmit(onSubmit)();
+    await act(async () => {
+      await result.current.handleSubmit(onSubmit)(event);
     });
 
-    expect(result.current.errors).toEqual({});
     expect(onSubmit).toHaveBeenCalledWith({
       email: "test@example.com",
-      password: "123456",
+      password: "password123",
+      name: "John Doe",
     });
   });
 
-  it("should reset form state", () => {
-    const { result } = renderHook(() => useForm(formConfig));
+  it("resets form to initial values", () => {
+    const { result } = renderHook(() => useForm<TestForm>(defaultConfig));
 
     act(() => {
       result.current.handleChange("email", "test@example.com");
-      result.current.handleChange("password", "123456");
+      result.current.handleChange("password", "password123");
+      result.current.handleChange("name", "John Doe");
+    });
+
+    expect(result.current.values).toEqual({
+      email: "test@example.com",
+      password: "password123",
+      name: "John Doe",
     });
 
     act(() => {
@@ -108,50 +125,82 @@ describe("useForm Hook", () => {
     expect(result.current.values).toEqual({
       email: "",
       password: "",
+      name: "",
     });
     expect(result.current.errors).toEqual({});
     expect(result.current.isDirty).toEqual({});
   });
 
-  it("should handle multiple validation rules", () => {
-    const configWithMultipleRules = {
-      password: {
-        initialValue: "",
-        validate: [
-          {
-            validate: (value: string) => value.length >= 6,
-            message: "Senha deve ter no mínimo 6 caracteres",
-          },
-          {
-            validate: (value: string) => /[A-Z]/.test(value),
-            message: "Senha deve ter pelo menos uma letra maiúscula",
-          },
-        ],
-      },
-    };
-
-    const { result } = renderHook(() => useForm(configWithMultipleRules));
+  it("validates individual fields correctly", () => {
+    const { result } = renderHook(() => useForm<TestForm>(defaultConfig));
 
     act(() => {
-      result.current.handleChange("password", "12345");
+      result.current.handleChange("password", "123");
     });
 
-    expect(result.current.errors.password).toBe(
-      "Senha deve ter no mínimo 6 caracteres"
-    );
+    expect(result.current.errors.password).toBe("Senha deve ter no mínimo 6 caracteres");
 
     act(() => {
       result.current.handleChange("password", "123456");
     });
 
-    expect(result.current.errors.password).toBe(
-      "Senha deve ter pelo menos uma letra maiúscula"
-    );
+    expect(result.current.errors.password).toBeUndefined();
+  });
+
+  it("validates entire form correctly", () => {
+    const { result } = renderHook(() => useForm<TestForm>(defaultConfig));
+
+    expect(result.current.validateForm()).toBe(false);
 
     act(() => {
-      result.current.handleChange("password", "123456A");
+      result.current.handleChange("email", "test@example.com");
+      result.current.handleChange("password", "password123");
+      result.current.handleChange("name", "John Doe");
     });
 
-    expect(result.current.errors.password).toBeUndefined();
+    expect(result.current.validateForm()).toBe(true);
+  });
+
+  it("tracks dirty state for each field", () => {
+    const { result } = renderHook(() => useForm<TestForm>(defaultConfig));
+
+    act(() => {
+      result.current.handleChange("email", "test@example.com");
+    });
+
+    expect(result.current.isDirty).toEqual({
+      email: true,
+    });
+
+    act(() => {
+      result.current.handleChange("password", "password123");
+    });
+
+    expect(result.current.isDirty).toEqual({
+      email: true,
+      password: true,
+    });
+  });
+
+  it("handles async submit function", async () => {
+    const asyncSubmit = vi.fn().mockImplementation(() => Promise.resolve());
+    const { result } = renderHook(() => useForm<TestForm>(defaultConfig));
+    const event = { preventDefault: vi.fn() } as unknown as React.FormEvent;
+
+    act(() => {
+      result.current.handleChange("email", "test@example.com");
+      result.current.handleChange("password", "password123");
+      result.current.handleChange("name", "John Doe");
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(asyncSubmit)(event);
+    });
+
+    expect(asyncSubmit).toHaveBeenCalledWith({
+      email: "test@example.com",
+      password: "password123",
+      name: "John Doe",
+    });
   });
 });

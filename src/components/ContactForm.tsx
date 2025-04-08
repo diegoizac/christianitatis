@@ -3,10 +3,12 @@ import { toast } from 'react-toastify'
 import { supabase } from '../lib/supabase'
 
 interface ContactFormProps {
-  onClose: () => void
+  onClose?: () => void
+  onSuccess?: () => void
+  onError?: (error: string) => void
 }
 
-const ContactForm: React.FC<ContactFormProps> = ({ onClose }) => {
+const ContactForm: React.FC<ContactFormProps> = ({ onClose, onSuccess, onError }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -52,10 +54,13 @@ const ContactForm: React.FC<ContactFormProps> = ({ onClose }) => {
       if (emailError) throw emailError
 
       toast.success('Mensagem enviada com sucesso!')
-      onClose()
+      onSuccess?.()
+      onClose?.()
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error)
-      toast.error('Erro ao enviar mensagem. Por favor, tente novamente.')
+      const errorMessage = 'Erro ao enviar mensagem. Por favor, tente novamente.'
+      toast.error(errorMessage)
+      onError?.(errorMessage)
     } finally {
       setIsSubmitting(false)
     }

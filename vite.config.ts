@@ -45,6 +45,10 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
+          src: 'src/assets/images/*',
+          dest: 'assets/images',
+        },
+        {
           src: 'src/assets/animations/*.glb',
           dest: 'assets/animations',
         },
@@ -90,9 +94,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@components': '/src/components',
-      '@pages': '/src/pages',
-      '@assets': '/src/assets',
+      '@components': path.resolve(__dirname, './src/components'),
+      '@pages': path.resolve(__dirname, './src/pages'),
+      '@assets': path.resolve(__dirname, './src/assets'),
+      '@images': path.resolve(__dirname, './src/assets/images'),
     },
   },
   define: {

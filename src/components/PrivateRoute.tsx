@@ -1,7 +1,12 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 
-export function PrivateRoute(): JSX.Element {
+interface PrivateRouteProps {
+  children: React.ReactNode
+  requireAdmin?: boolean
+}
+
+export function PrivateRoute({ children, requireAdmin = false }: PrivateRouteProps): JSX.Element {
   const { user, loading } = useAuth()
 
   if (loading) {
@@ -16,5 +21,10 @@ export function PrivateRoute(): JSX.Element {
     return <Navigate to="/login" replace />
   }
 
-  return <Outlet />
+  // Verificar se o usuário é admin quando necessário
+  if (requireAdmin && !user.user_metadata?.isAdmin) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  return <>{children}</>
 }

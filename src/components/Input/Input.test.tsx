@@ -1,8 +1,95 @@
+import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { Input } from '.'
 
 describe('Input Component', () => {
+  it('renders with default props', () => {
+    render(<Input placeholder="Type here" />)
+    const input = screen.getByPlaceholderText('Type here')
+    expect(input).toBeInTheDocument()
+    expect(input).toHaveClass('h-10') // medium size
+  })
+
+  it('renders with label', () => {
+    render(<Input label="Username" id="username" />)
+    const label = screen.getByText('Username')
+    expect(label).toBeInTheDocument()
+    expect(label).toHaveAttribute('for', 'username')
+  })
+
+  it('renders with error message', () => {
+    render(<Input error="This field is required" />)
+    const errorMessage = screen.getByText('This field is required')
+    expect(errorMessage).toBeInTheDocument()
+    expect(errorMessage).toHaveClass('text-red-500')
+  })
+
+  it('renders with help text', () => {
+    render(<Input helpText="Enter your username" />)
+    const helpText = screen.getByText('Enter your username')
+    expect(helpText).toBeInTheDocument()
+    expect(helpText).toHaveClass('text-gray-500')
+  })
+
+  it('renders with left icon', () => {
+    render(<Input leftIcon={<span data-testid="left-icon">🔍</span>} />)
+    const iconWrapper = screen.getByTestId('left-icon-wrapper')
+    const icon = screen.getByTestId('left-icon')
+    expect(iconWrapper).toBeInTheDocument()
+    expect(icon).toBeInTheDocument()
+  })
+
+  it('renders with right icon', () => {
+    render(<Input rightIcon={<span data-testid="right-icon">✓</span>} />)
+    const iconWrapper = screen.getByTestId('right-icon-wrapper')
+    const icon = screen.getByTestId('right-icon')
+    expect(iconWrapper).toBeInTheDocument()
+    expect(icon).toBeInTheDocument()
+  })
+
+  it('handles different sizes', () => {
+    const { rerender } = render(<Input size="sm" />)
+    expect(screen.getByRole('textbox')).toHaveClass('h-8')
+
+    rerender(<Input size="lg" />)
+    expect(screen.getByRole('textbox')).toHaveClass('h-12')
+  })
+
+  it('handles different variants', () => {
+    const { rerender } = render(<Input variant="outline" />)
+    expect(screen.getByRole('textbox').parentElement).toHaveClass('border-gray-300')
+
+    rerender(<Input variant="filled" />)
+    expect(screen.getByRole('textbox').parentElement).toHaveClass('bg-gray-100')
+  })
+
+  it('handles disabled state', () => {
+    render(<Input disabled />)
+    const input = screen.getByRole('textbox')
+    expect(input).toBeDisabled()
+    expect(input).toHaveClass('opacity-50')
+    expect(input).toHaveClass('cursor-not-allowed')
+  })
+
+  it('handles user input', async () => {
+    const handleChange = vi.fn()
+    render(<Input onChange={handleChange} />)
+
+    const input = screen.getByRole('textbox')
+    await userEvent.type(input, 'test')
+
+    expect(handleChange).toHaveBeenCalledTimes(4) // one call per character
+    expect(input).toHaveValue('test')
+  })
+
+  it('forwards ref correctly', () => {
+    const ref = React.createRef<HTMLInputElement>()
+    render(<Input ref={ref} />)
+    expect(ref.current).toBeInstanceOf(HTMLInputElement)
+  })
+
   it('should render correctly', () => {
     render(<Input placeholder="Digite algo" />)
     expect(screen.getByPlaceholderText('Digite algo')).toBeInTheDocument()

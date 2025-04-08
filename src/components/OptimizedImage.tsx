@@ -1,77 +1,31 @@
-import React, { useState } from "react";
+import React from 'react'
+import { useSupabaseAsset } from '@/hooks/useSupabaseAsset'
+import { Spinner } from './Spinner'
 
-interface OptimizedImageProps {
-  src: string;
-  alt: string;
-  className?: string;
-  width?: number;
-  height?: number;
-  loading?: "lazy" | "eager";
+interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+  src: string
+  alt: string
+  className?: string
 }
 
-const OptimizedImage: React.FC<OptimizedImageProps> = ({
-  src,
-  alt,
-  className = "",
-  width,
-  height,
-  loading = "lazy",
-}) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
+export function OptimizedImage({ src, alt, className = '', ...props }: OptimizedImageProps) {
+  const { url, loading, error } = useSupabaseAsset({
+    path: src,
+    bucket: 'images',
+    fallback: '/images/placeholder.svg',
+  })
 
-  const handleLoad = () => {
-    setIsLoading(false);
-  };
+  if (loading) {
+    return <Spinner className={className} />
+  }
 
-  const handleError = () => {
-    setIsLoading(false);
-    setError(true);
-  };
+  if (error) {
+    return (
+      <div className={`flex items-center justify-center ${className}`}>
+        <span className="text-red-500">Erro ao carregar imagem</span>
+      </div>
+    )
+  }
 
-  const generateSrcSet = () => {
-    if (!width) return undefined;
-
-    const sizes = [0.5, 1, 1.5, 2];
-    return sizes
-      .map((size) => {
-        const w = Math.round(width * size);
-        return `${src}?w=${w} ${w}w`;
-      })
-      .join(", ");
-  };
-
-  return (
-    <div className={`relative ${className}`}>
-      {isLoading && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
-      )}
-      {error ? (
-        <div className="flex items-center justify-center w-full h-full bg-gray-200 dark:bg-gray-700">
-          <span className="text-gray-500 dark:text-gray-400">
-            Erro ao carregar imagem
-          </span>
-        </div>
-      ) : (
-        <img
-          src={src}
-          alt={alt}
-          className={`w-full h-full object-cover ${
-            isLoading ? "opacity-0" : "opacity-100"
-          }`}
-          width={width}
-          height={height}
-          loading={loading}
-          onLoad={handleLoad}
-          onError={handleError}
-          srcSet={generateSrcSet()}
-          sizes={
-            width ? `(max-width: ${width}px) 100vw, ${width}px` : undefined
-          }
-        />
-      )}
-    </div>
-  );
-};
-
-export default OptimizedImage;
+  return <img src={url} alt={alt} className={className} {...props} />
+}

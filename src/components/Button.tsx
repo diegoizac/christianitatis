@@ -6,7 +6,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
    * Variação visual do botão
    * @default 'primary'
    */
-  variant?: 'primary' | 'secondary' | 'outline'
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'white'
 
   /**
    * Tamanho do botão
@@ -46,6 +46,8 @@ export const Button: React.FC<ButtonProps> = ({
     primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
     secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
     outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
+    ghost: 'text-white hover:bg-white/10 focus:ring-white',
+    white: 'bg-white text-blue-600 hover:bg-blue-50 focus:ring-white',
   }
 
   const sizeStyles = {

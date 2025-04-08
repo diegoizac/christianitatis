@@ -27,7 +27,7 @@ export const mockAuthContext = {
 
 export const AuthContext = createContext(mockAuthContext)
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export function AuthProviderMock({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={mockAuthContext}>
       {children}

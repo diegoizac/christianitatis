@@ -10,7 +10,7 @@ export type FieldConfig<T> = {
   validate?: ValidationRule<T>[]
 }
 
-export type FormConfig<T> = {
+export type FormConfig<T extends Record<string, unknown>> = {
   [K in keyof T]: FieldConfig<T[K]>
 }
 

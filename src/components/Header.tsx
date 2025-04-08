@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Globe, ChevronDown, User, LogOut, Calendar } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import logoImg from '@/assets/images/logo-main.png'
 
 interface HeaderProps {
   isScrolled: boolean
@@ -33,7 +34,7 @@ const Header: React.FC<HeaderProps> = ({ isScrolled, setActiveModal, onOpenAuth 
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <img src="/images/logo-main.png" alt="Logo Christianitatis" className="h-12 w-auto" />
+            <img src={logoImg} alt="Logo Christianitatis" className="h-12 w-auto" />
           </Link>
 
           {/* Menu e Botões */}
