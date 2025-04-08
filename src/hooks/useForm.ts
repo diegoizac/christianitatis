@@ -10,7 +10,7 @@ export type FieldConfig<T> = {
   validate?: ValidationRule<T>[]
 }
 
-export type FormConfig<T> = {
+export type FormConfig<T extends Record<string, unknown>> = {
   [K in keyof T]: FieldConfig<T[K]>
 }
 
@@ -64,7 +64,7 @@ export function useForm<T extends Record<string, unknown>>(
   const validateField = useCallback(
     (name: keyof T, value: T[keyof T]): string | undefined => {
       const fieldConfig = config[name]
-      if (!fieldConfig.validate) return undefined
+      if (!fieldConfig?.validate) return undefined
 
       for (const rule of fieldConfig.validate) {
         if (!rule.validate(value)) {

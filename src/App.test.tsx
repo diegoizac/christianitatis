@@ -1,22 +1,55 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { BrowserRouter } from 'react-router-dom'
 import App from './App'
+import { AuthProvider } from './contexts/AuthContext'
 
-describe('App', () => {
-  it('renders without crashing', () => {
-    render(<App />)
-    expect(document.querySelector('.main-container')).toBeTruthy()
+vi.mock('./contexts/AuthContext', () => ({
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  useAuth: () => ({
+    user: null,
+    loading: false,
+    error: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+    register: vi.fn(),
+  }),
+}))
+
+describe('App Component', () => {
+  it('should render without errors', () => {
+    render(
+      <BrowserRouter>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </BrowserRouter>
+    )
+
+    expect(screen.getByRole('main')).toBeInTheDocument()
   })
 
-  it('contains header component', () => {
-    render(<App />)
-    const header = document.querySelector('header')
-    expect(header).toBeTruthy()
+  it('should render navigation', () => {
+    render(
+      <BrowserRouter>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </BrowserRouter>
+    )
+
+    expect(screen.getByRole('navigation')).toBeInTheDocument()
   })
 
-  it('contains footer component', () => {
-    render(<App />)
-    const footer = document.querySelector('footer')
-    expect(footer).toBeTruthy()
+  it('should render footer', () => {
+    render(
+      <BrowserRouter>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </BrowserRouter>
+    )
+
+    expect(screen.getByRole('contentinfo')).toBeInTheDocument()
   })
 })

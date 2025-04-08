@@ -1,45 +1,53 @@
-import { securityConfig } from "../../config/security.config";
-import DOMPurify from "dompurify";
+import DOMPurify from 'dompurify'
 
-export const sanitizeHTML = (dirty: string): string => {
-  return DOMPurify.sanitize(dirty, {
-    ALLOWED_TAGS: securityConfig.sanitization.allowedTags,
-    ALLOWED_ATTR: Object.entries(
-      securityConfig.sanitization.allowedAttributes
-    ).flatMap(([_, attrs]) => attrs),
-  });
-};
-
-export const sanitizeInput = (input: string): string => {
-  // Remove caracteres potencialmente perigosos
-  return input.replace(/[<>'"]/g, "");
-};
-
-export const escapeSQL = (value: string): string => {
-  if (typeof value !== "string") {
-    return value;
+/**
+ * Sanitiza HTML removendo tags e atributos maliciosos
+ * @param dirty HTML sujo que precisa ser sanitizado
+ * @returns HTML limpo e seguro
+ */
+export function sanitizeHTML(dirty: string): string {
+  const config = {
+    ALLOWED_TAGS: [
+      'p',
+      'strong',
+      'em',
+      'u',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'ul',
+      'ol',
+      'li',
+      'a',
+      'br',
+    ],
+    ALLOWED_ATTR: ['href', 'target', 'rel'],
+    KEEP_CONTENT: true,
   }
-  return value.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, (char) => {
-    switch (char) {
-      case "\0":
-        return "\\0";
-      case "\x08":
-        return "\\b";
-      case "\x09":
-        return "\\t";
-      case "\x1a":
-        return "\\z";
-      case "\n":
-        return "\\n";
-      case "\r":
-        return "\\r";
-      case '"':
-      case "'":
-      case "\\":
-      case "%":
-        return "\\" + char; // prepends a backslash to backslash, percent, and double/single quotes
-      default:
-        return char;
-    }
-  });
-};
+
+  return DOMPurify.sanitize(dirty, config)
+}
+
+/**
+ * Remove caracteres especiais e potencialmente perigosos de uma string
+ * @param input String que precisa ser sanitizada
+ * @returns String limpa e segura
+ */
+export function sanitizeInput(input: string): string {
+  return input.replace(/[<>'"]/g, '')
+}
+
+/**
+ * Escapa caracteres especiais do SQL para prevenir injeção SQL
+ * @param input Valor que precisa ser escapado
+ * @returns Valor escapado seguro para SQL
+ */
+export function escapeSQL(
+  input: string | number | boolean | null | undefined
+): string | number | boolean | null | undefined {
+  if (typeof input !== 'string') return input
+  return input.replace(/[\\']/g, '\\$&')
+}

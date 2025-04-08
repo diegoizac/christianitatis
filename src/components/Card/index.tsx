@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { clsx } from 'clsx'
+import { cn } from '../../utils'
 
 interface CardProps {
   /**
@@ -31,10 +32,6 @@ interface CardProps {
    * Classes CSS adicionais
    */
   className?: string
-  /**
-   * Variante do card
-   */
-  variant?: 'default' | 'project' | 'feature'
   /**
    * Tamanho do card
    */
@@ -74,7 +71,6 @@ export function Card({
   href,
   image,
   className,
-  variant = 'default',
   size = 'md',
   onClick,
 }: CardProps) {
@@ -242,18 +238,20 @@ export function Card({
     </motion.div>
   )
 
-  if (href) {
-    return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block w-full h-full focus:outline-none focus:ring-2 focus:ring-accent/50 rounded-xl"
-      >
-        {cardContent}
-      </a>
-    )
-  }
+  const CardWrapper = href ? 'a' : 'div'
 
-  return cardContent
+  return (
+    <CardWrapper
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        'block w-full h-full focus:outline-none focus:ring-2 focus:ring-accent/50 rounded-xl',
+        className
+      )}
+      data-testid="card"
+    >
+      {cardContent}
+    </CardWrapper>
+  )
 }

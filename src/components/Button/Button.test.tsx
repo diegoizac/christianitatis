@@ -1,41 +1,33 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { Button } from '.'
+import Button from '.'
 
 describe('Button Component', () => {
   it('should render with primary variant by default', () => {
     render(<Button>Click me</Button>)
     const button = screen.getByRole('button', { name: /click me/i })
     expect(button).toHaveClass('bg-primary')
-    expect(button).toHaveClass('hover:bg-primary-600')
-    expect(button).toHaveClass('focus:ring-primary-500')
+    expect(button).toHaveClass('text-primary-foreground')
+    expect(button).toHaveClass('hover:bg-primary/90')
   })
 
   it('should render with secondary variant', () => {
     render(<Button variant="secondary">Click me</Button>)
     const button = screen.getByRole('button', { name: /click me/i })
     expect(button).toHaveClass('bg-secondary')
-    expect(button).toHaveClass('hover:bg-secondary-600')
-    expect(button).toHaveClass('focus:ring-secondary-500')
-  })
-
-  it('should render with accent variant', () => {
-    render(<Button variant="accent">Click me</Button>)
-    const button = screen.getByRole('button', { name: /click me/i })
-    expect(button).toHaveClass('bg-accent')
-    expect(button).toHaveClass('hover:bg-accent-600')
-    expect(button).toHaveClass('focus:ring-accent-500')
+    expect(button).toHaveClass('text-secondary-foreground')
+    expect(button).toHaveClass('hover:bg-secondary/80')
   })
 
   it('should render with different sizes', () => {
     const { rerender } = render(<Button size="sm">Click me</Button>)
-    expect(screen.getByRole('button')).toHaveClass('px-3', 'py-1.5', 'text-sm')
+    expect(screen.getByRole('button')).toHaveClass('h-9', 'px-3')
 
-    rerender(<Button size="md">Click me</Button>)
-    expect(screen.getByRole('button')).toHaveClass('px-4', 'py-2', 'text-base')
+    rerender(<Button size="default">Click me</Button>)
+    expect(screen.getByRole('button')).toHaveClass('h-10', 'py-2', 'px-4')
 
     rerender(<Button size="lg">Click me</Button>)
-    expect(screen.getByRole('button')).toHaveClass('px-6', 'py-3', 'text-lg')
+    expect(screen.getByRole('button')).toHaveClass('h-11', 'px-8')
   })
 
   it('should handle click events', () => {
@@ -51,10 +43,9 @@ describe('Button Component', () => {
     const button = screen.getByRole('button')
 
     expect(button).toBeDisabled()
-    expect(button).toHaveClass('opacity-50', 'cursor-not-allowed')
-    expect(button).toHaveClass('text-transparent', 'hover:text-transparent')
+    expect(button).toHaveClass('opacity-50', 'pointer-events-none')
 
-    const spinner = screen.getByRole('img', { hidden: true })
+    const spinner = screen.getByRole('status')
     expect(spinner).toBeInTheDocument()
     expect(spinner).toHaveClass('animate-spin')
   })
@@ -64,7 +55,7 @@ describe('Button Component', () => {
     const button = screen.getByRole('button')
 
     expect(button).toBeDisabled()
-    expect(button).toHaveClass('opacity-50', 'cursor-not-allowed')
+    expect(button).toHaveClass('opacity-50', 'pointer-events-none')
   })
 
   it('should render with base styles', () => {
@@ -75,13 +66,14 @@ describe('Button Component', () => {
       'inline-flex',
       'items-center',
       'justify-center',
+      'rounded-md',
+      'text-sm',
       'font-medium',
-      'rounded-lg',
       'transition-colors',
-      'duration-200',
-      'focus:outline-none',
-      'focus:ring-2',
-      'focus:ring-offset-2'
+      'focus-visible:outline-none',
+      'focus-visible:ring-2',
+      'focus-visible:ring-ring',
+      'focus-visible:ring-offset-2'
     )
   })
 

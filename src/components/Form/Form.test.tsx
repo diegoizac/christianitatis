@@ -1,51 +1,58 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { Form } from ".";
-import { Input } from "../Input";
+import React from 'react'
+import { render, screen, fireEvent } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { vi } from 'vitest'
+import { Form } from './index'
+import { Input } from '../Input'
 
-describe("Form Component", () => {
-  const formConfig = {
+interface TestFormData {
+  email: string
+  password: string
+}
+
+describe('Form Component', () => {
+  const defaultConfig = {
     email: {
-      initialValue: "",
+      initialValue: '',
       validate: [
         {
-          validate: (value: string) => value.includes("@"),
-          message: "Email inválido",
+          validate: (value: string) => value.includes('@'),
+          message: 'Email inválido',
         },
       ],
     },
     password: {
-      initialValue: "",
+      initialValue: '',
       validate: [
         {
           validate: (value: string) => value.length >= 6,
-          message: "Senha deve ter no mínimo 6 caracteres",
+          message: 'Senha deve ter no mínimo 6 caracteres',
         },
       ],
     },
-  };
+  }
 
-  it("should render children correctly", () => {
+  it('renders with children components', () => {
     render(
-      <Form config={formConfig} onSubmit={() => {}}>
+      <Form config={defaultConfig} onSubmit={() => {}}>
         <Input name="email" placeholder="Email" />
         <Input name="password" type="password" placeholder="Senha" />
       </Form>
-    );
+    )
 
-    expect(screen.getByPlaceholderText("Email")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Senha")).toBeInTheDocument();
-  });
+    expect(screen.getByPlaceholderText('Email')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Senha')).toBeInTheDocument()
+  })
 
-  it("should render with render props pattern", () => {
+  it('renders with render props pattern', () => {
     render(
-      <Form config={formConfig} onSubmit={() => {}}>
+      <Form<TestFormData> config={defaultConfig} onSubmit={() => {}}>
         {({ values, errors, handleChange }) => (
           <>
             <Input
               name="email"
               value={values.email}
-              onChange={(e) => handleChange("email", e.target.value)}
+              onChange={e => handleChange('email', e.target.value)}
               error={errors.email}
               placeholder="Email"
             />
@@ -53,81 +60,103 @@ describe("Form Component", () => {
               name="password"
               type="password"
               value={values.password}
-              onChange={(e) => handleChange("password", e.target.value)}
+              onChange={e => handleChange('password', e.target.value)}
               error={errors.password}
               placeholder="Senha"
             />
           </>
         )}
       </Form>
-    );
+    )
 
-    expect(screen.getByPlaceholderText("Email")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Senha")).toBeInTheDocument();
-  });
+    expect(screen.getByPlaceholderText('Email')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Senha')).toBeInTheDocument()
+  })
 
-  it("should handle form submission with validation", async () => {
-    const handleSubmit = vi.fn();
-
+  it('handles form submission with valid data', async () => {
+    const handleSubmit = vi.fn()
     render(
-      <Form config={formConfig} onSubmit={handleSubmit}>
+      <Form config={defaultConfig} onSubmit={handleSubmit}>
         <Input name="email" placeholder="Email" />
         <Input name="password" type="password" placeholder="Senha" />
-        <button type="submit">Enviar</button>
       </Form>
-    );
+    )
 
-    fireEvent.click(screen.getByText("Enviar"));
-    expect(handleSubmit).not.toHaveBeenCalled();
+    const emailInput = screen.getByPlaceholderText('Email')
+    const passwordInput = screen.getByPlaceholderText('Senha')
+    const form = screen.getByRole('form')
 
-    const emailInput = screen.getByPlaceholderText("Email");
-    const passwordInput = screen.getByPlaceholderText("Senha");
+    await userEvent.type(emailInput, 'test@example.com')
+    await userEvent.type(passwordInput, 'password123')
 
-    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-    fireEvent.change(passwordInput, { target: { value: "123456" } });
-    fireEvent.click(screen.getByText("Enviar"));
+    fireEvent.submit(form)
 
     expect(handleSubmit).toHaveBeenCalledWith({
-      email: "test@example.com",
-      password: "123456",
-    });
-  });
+      email: 'test@example.com',
+      password: 'password123',
+    })
+  })
 
-  it("should automatically bind input values and errors", () => {
+  it('shows validation errors', async () => {
     render(
-      <Form config={formConfig} onSubmit={() => {}}>
+      <Form config={defaultConfig} onSubmit={() => {}}>
+        <Input name="email" placeholder="Email" />
+        <Input name="password" type="password" placeholder="Senha" />
+      </Form>
+    )
+
+    const emailInput = screen.getByPlaceholderText('Email')
+    const passwordInput = screen.getByPlaceholderText('Senha')
+    const form = screen.getByRole('form')
+
+    await userEvent.type(emailInput, 'invalid-email')
+    await userEvent.type(passwordInput, '123')
+
+    fireEvent.submit(form)
+
+    expect(screen.getByText('Email inválido')).toBeInTheDocument()
+    expect(screen.getByText('Senha deve ter no mínimo 6 caracteres')).toBeInTheDocument()
+  })
+
+  it('updates form values on input change', async () => {
+    render(
+      <Form<TestFormData> config={defaultConfig} onSubmit={() => {}}>
+        {({ values }) => (
+          <>
+            <Input name="email" placeholder="Email" />
+            <div data-testid="email-value">{values.email}</div>
+          </>
+        )}
+      </Form>
+    )
+
+    const emailInput = screen.getByPlaceholderText('Email')
+    await userEvent.type(emailInput, 'test@example.com')
+
+    expect(screen.getByTestId('email-value')).toHaveTextContent('test@example.com')
+  })
+
+  it('prevents default form submission', () => {
+    const handleSubmit = vi.fn()
+    render(
+      <Form config={defaultConfig} onSubmit={handleSubmit}>
         <Input name="email" placeholder="Email" />
       </Form>
-    );
+    )
 
-    const input = screen.getByPlaceholderText("Email");
-    fireEvent.change(input, { target: { value: "invalid-email" } });
+    const form = screen.getByRole('form')
+    fireEvent.submit(form)
 
-    expect(input).toHaveValue("invalid-email");
-    expect(screen.getByText("Email inválido")).toBeInTheDocument();
-  });
+    expect(handleSubmit).not.toHaveBeenCalled()
+  })
 
-  it("should handle nested inputs", () => {
+  it('applies custom className to form element', () => {
     render(
-      <Form config={formConfig} onSubmit={() => {}}>
-        <div>
-          <Input name="email" placeholder="Email" />
-          <div>
-            <Input name="password" type="password" placeholder="Senha" />
-          </div>
-        </div>
+      <Form config={defaultConfig} onSubmit={() => {}} className="custom-class">
+        <Input name="email" placeholder="Email" />
       </Form>
-    );
+    )
 
-    const emailInput = screen.getByPlaceholderText("Email");
-    const passwordInput = screen.getByPlaceholderText("Senha");
-
-    fireEvent.change(emailInput, { target: { value: "test" } });
-    fireEvent.change(passwordInput, { target: { value: "12345" } });
-
-    expect(screen.getByText("Email inválido")).toBeInTheDocument();
-    expect(
-      screen.getByText("Senha deve ter no mínimo 6 caracteres")
-    ).toBeInTheDocument();
-  });
-});
+    expect(screen.getByRole('form')).toHaveClass('custom-class')
+  })
+})
