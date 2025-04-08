@@ -1,5 +1,15 @@
-import '@testing-library/jest-dom'
+import { expect, afterEach } from 'vitest'
+import { cleanup } from '@testing-library/react'
+import matchers from '@testing-library/jest-dom/matchers'
 import { vi } from 'vitest'
+
+// Estende os matchers do expect
+expect.extend(matchers)
+
+// Limpa o DOM após cada teste
+afterEach(() => {
+  cleanup()
+})
 
 // Mock do ResizeObserver
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
@@ -78,9 +88,4 @@ vi.mock('react-toastify', () => ({
     success: vi.fn(),
     error: vi.fn(),
   },
-}))
-
-// Limpa todos os mocks após cada teste
-afterEach(() => {
-  vi.clearAllMocks()
-}) 
+})) 
