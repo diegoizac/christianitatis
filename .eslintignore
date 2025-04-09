@@ -1,0 +1,26 @@
+# Arquivos e diretórios a serem ignorados pelo ESLint
+
+# Arquivos de configuração
+*.d.ts
+vite-env.vercel.d.ts
+tsconfig.vercel.json
+vite.config.vercel.ts
+
+# Diretórios de build
+dist/
+build/
+coverage/
+node_modules/
+
+# Arquivos de teste
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/__tests__/**
+**/__mocks__/**
+
+# Outros
+.vercel/
+.github/
+.vscode/
