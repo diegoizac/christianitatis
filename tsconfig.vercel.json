@@ -1,8 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "noEmit": false,
-    "emitDeclarationOnly": false,
+    "noEmit": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
     "noUnusedLocals": false,
