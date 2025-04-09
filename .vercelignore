@@ -1,0 +1,47 @@
+# Arquivos e diretórios a serem ignorados pelo Vercel
+
+# Arquivos de desenvolvimento
+.git
+.github
+.vscode
+.idea
+.DS_Store
+*.log
+*.swp
+*.bak
+
+# Diretórios de dependências
+node_modules
+.pnp
+.pnp.js
+
+# Arquivos de teste
+**/*.test.*
+**/*.spec.*
+**/__tests__
+**/__mocks__
+coverage
+.nyc_output
+
+# Arquivos de configuração de desenvolvimento
+.eslintrc*
+.prettierrc*
+.stylelintrc*
+.lintstagedrc*
+.editorconfig
+.browserslistrc
+jest.config.*
+vitest.config.*
+tsconfig.*.json
+!tsconfig.vercel.json
+
+# Arquivos de documentação
+*.md
+docs
+LICENSE
+
+# Outros
+.husky
+.storybook
+storybook-static
+chromatic.config.json
