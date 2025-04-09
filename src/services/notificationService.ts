@@ -1,5 +1,8 @@
 import { supabase } from '@/lib/supabase'
 
+/**
+ * Interface para notificações
+ */
 export interface Notification {
   id: string
   user_id: string
@@ -69,64 +72,104 @@ class NotificationService {
     if (error) throw error
   }
 
-  async createEventPendingNotification(eventId: string, adminId: string) {
-    const { data: event, error: eventError } = await supabase
-      .from('events')
-      .select('title')
-      .eq('id', eventId)
-      .single()
+  /**
+   * Cria uma notificação para administradores sobre um evento pendente
+   * @param eventId ID do evento
+   * @param adminId ID do administrador
+   */
+  async createEventPendingNotification(eventId: string, adminId: string): Promise<void> {
+    try {
+      const { data: event, error: eventError } = await supabase
+        .from('events')
+        .select('title')
+        .eq('id', eventId)
+        .single()
 
-    if (eventError) throw eventError
+      if (eventError) throw eventError
 
-    const { error } = await supabase.from('notifications').insert({
-      user_id: adminId,
-      type: 'event_pending',
-      title: 'Novo evento para aprovação',
-      message: `O evento "${event.title}" está aguardando sua aprovação.`,
-      event_id: eventId,
-    })
+      const { error } = await supabase.from('notifications').insert({
+        user_id: adminId,
+        type: 'event_pending',
+        title: 'Novo evento para aprovação',
+        message: `O evento "${event.title}" está aguardando sua aprovação.`,
+        event_id: eventId,
+        read: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
 
-    if (error) throw error
+      if (error) throw error
+    } catch (error) {
+      console.error('Erro ao criar notificação de evento pendente:', error)
+      throw error
+    }
   }
 
-  async createEventApprovedNotification(eventId: string, userId: string) {
-    const { data: event, error: eventError } = await supabase
-      .from('events')
-      .select('title')
-      .eq('id', eventId)
-      .single()
+  /**
+   * Cria uma notificação para o criador do evento quando ele é aprovado
+   * @param eventId ID do evento
+   * @param userId ID do usuário criador
+   */
+  async createEventApprovedNotification(eventId: string, userId: string): Promise<void> {
+    try {
+      const { data: event, error: eventError } = await supabase
+        .from('events')
+        .select('title')
+        .eq('id', eventId)
+        .single()
 
-    if (eventError) throw eventError
+      if (eventError) throw eventError
 
-    const { error } = await supabase.from('notifications').insert({
-      user_id: userId,
-      type: 'event_approved',
-      title: 'Evento aprovado!',
-      message: `Seu evento "${event.title}" foi aprovado e está publicado.`,
-      event_id: eventId,
-    })
+      const { error } = await supabase.from('notifications').insert({
+        user_id: userId,
+        type: 'event_approved',
+        title: 'Evento aprovado!',
+        message: `Seu evento "${event.title}" foi aprovado e está publicado.`,
+        event_id: eventId,
+        read: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
 
-    if (error) throw error
+      if (error) throw error
+    } catch (error) {
+      console.error('Erro ao criar notificação de evento aprovado:', error)
+      throw error
+    }
   }
 
-  async createEventRejectedNotification(eventId: string, userId: string, reason: string) {
-    const { data: event, error: eventError } = await supabase
-      .from('events')
-      .select('title')
-      .eq('id', eventId)
-      .single()
+  /**
+   * Cria uma notificação para o criador do evento quando ele é rejeitado
+   * @param eventId ID do evento
+   * @param userId ID do usuário criador
+   * @param justificativa Motivo da rejeição
+   */
+  async createEventRejectedNotification(eventId: string, userId: string, justificativa: string): Promise<void> {
+    try {
+      const { data: event, error: eventError } = await supabase
+        .from('events')
+        .select('title')
+        .eq('id', eventId)
+        .single()
 
-    if (eventError) throw eventError
+      if (eventError) throw eventError
 
-    const { error } = await supabase.from('notifications').insert({
-      user_id: userId,
-      type: 'event_rejected',
-      title: 'Evento rejeitado',
-      message: `Seu evento "${event.title}" foi rejeitado. Motivo: ${reason}`,
-      event_id: eventId,
-    })
+      const { error } = await supabase.from('notifications').insert({
+        user_id: userId,
+        type: 'event_rejected',
+        title: 'Evento rejeitado',
+        message: `Seu evento "${event.title}" foi rejeitado. Motivo: ${justificativa}`,
+        event_id: eventId,
+        read: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
 
-    if (error) throw error
+      if (error) throw error
+    } catch (error) {
+      console.error('Erro ao criar notificação de evento rejeitado:', error)
+      throw error
+    }
   }
 }
 

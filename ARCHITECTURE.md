@@ -1,354 +1,312 @@
-# Arquitetura do Projeto Christianitatis
+# Plano de Implementação: Módulo de Eventos Christianitatis.org
 
-## Visão Geral
+Este documento apresenta um plano detalhado para a refatoração e implementação do Módulo de Eventos do Christianitatis.org, alinhando o código existente com a documentação técnica e funcional.
 
-O Christianitatis é uma aplicação web moderna construída com:
+## Sumário Executivo
 
-- React + Vite
-- TypeScript
-- Supabase (Backend as a Service)
-- TailwindCSS
-- Vercel (Deploy)
-
-## Estrutura de Diretórios
-
-```
-christianitatis/
-├── src/               # Código fonte da aplicação
-│   ├── components/    # Componentes React reutilizáveis
-│   ├── contexts/      # Contextos React (Auth, Theme, etc)
-│   ├── hooks/         # Custom hooks
-│   ├── pages/         # Páginas/rotas da aplicação
-│   ├── services/      # Serviços (API, Auth, etc)
-│   ├── styles/        # Estilos globais e utilitários
-│   ├── types/         # Definições de tipos TypeScript
-│   └── utils/         # Funções utilitárias
-├── public/            # Arquivos estáticos
-├── docs/              # Documentação
-└── scripts/           # Scripts de automação
-```
-
-## Tecnologias Principais
-
-### Frontend
-- **React 18**: Framework UI principal
-- **Vite**: Build tool e dev server
-- **TypeScript**: Tipagem estática
-- **TailwindCSS**: Estilização
-- **React Router**: Roteamento
-- **React Query**: Gerenciamento de estado e cache
-- **React Hook Form**: Gerenciamento de formulários
-- **Zod**: Validação de dados
-- **Vitest**: Testes unitários
-- **Testing Library**: Testes de componentes
-- **Storybook**: Documentação de componentes
-
-### Backend (Supabase)
-- **PostgreSQL**: Banco de dados principal
-- **PostgREST**: API RESTful automática
-- **GoTrue**: Autenticação
-- **Storage**: Armazenamento de arquivos
-- **Edge Functions**: Funções serverless
-- **Realtime**: Subscriptions em tempo real
-
-### DevOps
-- **GitHub Actions**: CI/CD
-- **Vercel**: Hosting e deploy
-- **Husky**: Git hooks
-- **ESLint/Prettier**: Linting e formatação
-
-## Ambientes e Configurações
-
-### Desenvolvimento Local
-
-```bash
-# .env.local
-VITE_APP_ENV=development
-VITE_SUPABASE_URL=***
-VITE_SUPABASE_ANON_KEY=***
-```
-
-Características:
-
-- Hot reload ativo
-- Ferramentas de debug
-- Logs detalhados
-- Supabase local/dev
-
-### Homologação
-
-```bash
-# .env.staging
-VITE_APP_ENV=staging
-VITE_SUPABASE_URL=***
-VITE_SUPABASE_ANON_KEY=***
-```
-
-Características:
-
-- Ambiente espelho de produção
-- Dados de teste
-- Monitoramento ativo
-- Supabase staging
-
-### Produção
-
-```bash
-# .env.production + .env.vercel
-VITE_APP_ENV=production
-VITE_SUPABASE_URL=***
-VITE_SUPABASE_ANON_KEY=***
-```
-
-Características:
-
-- Otimizações de performance
-- Segurança reforçada
-- Analytics
-- Supabase produção
-
-## Arquitetura de Dados
-
-### Modelos Principais
-
-1. **User**
-   ```typescript
-   interface User {
-     id: string
-     email: string
-     nome: string
-     role: 'admin' | 'coordenador' | 'usuario'
-     diocese?: string
-     paroquia?: string
-     created_at: string
-     updated_at: string
-   }
-   ```
-
-2. **Evento**
-   ```typescript
-   interface Evento {
-     id: string
-     titulo: string
-     descricao: string
-     data_inicio: string
-     data_fim: string
-     local: string
-     tipo: 'retiro' | 'formacao' | 'encontro'
-     vagas: number
-     status: 'draft' | 'published' | 'cancelled'
-     created_by: string
-     created_at: string
-     updated_at: string
-   }
-   ```
-
-3. **Inscricao**
-   ```typescript
-   interface Inscricao {
-     id: string
-     evento_id: string
-     user_id: string
-     status: 'pending' | 'confirmed' | 'cancelled'
-     created_at: string
-     updated_at: string
-   }
-   ```
-
-### Relacionamentos
+Após análise do código atual e da documentação fornecida, identificamos a necessidade de uma refatoração profunda para resolver inconsistências de tipos e melhorar a integração entre componentes. O plano abaixo divide a implementação em fases lógicas, priorizando igualmente a visualização pública e o sistema de cadastro/moderação.
 
 ```mermaid
-erDiagram
-    User ||--o{ Evento : "creates"
-    User ||--o{ Inscricao : "makes"
-    Evento ||--o{ Inscricao : "has"
+gantt
+    title Cronograma de Implementação
+    dateFormat  YYYY-MM-DD
+    section Fase 1
+    Refatoração da Estrutura de Dados    :a1, 2025-04-10, 7d
+    section Fase 2
+    Implementação do Modal na Home       :a2, after a1, 10d
+    Refatoração do Sistema de Cadastro   :a3, after a1, 10d
+    section Fase 3
+    Implementação do Sistema de Moderação :a4, after a2 a3, 7d
+    section Fase 4
+    Testes e Ajustes Finais              :a5, after a4, 5d
 ```
 
-## Fluxo de Autenticação
+## Fase 1: Refatoração da Estrutura de Dados
 
-1. **Login/Registro**
+### 1.1 Unificação dos Tipos e Interfaces
 
-   - Via Supabase Auth
-   - Armazenamento seguro de tokens
-   - Refresh automático de sessão
-
-2. **Autorização**
-   - Roles: Admin, Coordenador, Usuário
-   - Guards nas rotas
-   - Validação de permissões
-
-## Padrões de Código
-
-### Componentes React
-
-```typescript
-// Estrutura de Componente
-import React from 'react'
-import styles from './Component.module.css'
-
-interface ComponentProps {
-  // props tipadas
-}
-
-export const Component: React.FC<ComponentProps> = ({ ...props }) => {
-  return (...)
-}
-```
-
-### Hooks Customizados
-
-```typescript
-// Estrutura de Hook
-import { useState, useEffect } from 'react'
-
-export const useCustomHook = (params: Type) => {
-  // lógica do hook
-  return { data, methods }
-}
-```
-
-### Tratamento de Erros
-
-```typescript
-// Error Boundary Component
-class ErrorBoundary extends React.Component<Props, State> {
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error }
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo)
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return <ErrorFallback error={this.state.error} />
+```mermaid
+classDiagram
+    class Event {
+        +id: UUID
+        +title: String
+        +description: Text
+        +date: Date
+        +location: String
+        +lat: Float?
+        +lng: Float?
+        +media_urls: String[]
+        +user_id: UUID
+        +status: EventStatus
+        +justificativa: String?
+        +created_at: Timestamp
     }
-    return this.props.children
-  }
-}
+
+    class EventStatus {
+        <<enumeration>>
+        PENDENTE
+        APROVADO
+        REPROVADO
+    }
+
+    Event --> EventStatus
 ```
 
-## Pipeline de Deploy
+#### Tarefas:
+
+1. **Atualizar `src/types/Event.ts`**:
+
+   - Alinhar com a estrutura da tabela Supabase conforme documentação
+   - Remover interfaces duplicadas e consolidar tipos
+
+2. **Criar mapeamentos entre tipos do Supabase e da aplicação**:
+
+   - Implementar funções de conversão para garantir consistência
+
+3. **Documentar o modelo de dados**:
+   - Criar documentação clara sobre a estrutura e relacionamentos
+
+### 1.2 Centralização dos Serviços
 
 ```mermaid
-graph LR
-    A[Desenvolvimento] --> B[Pull Request]
-    B --> C[Testes]
-    C --> D[Build]
-    D --> E[Deploy Vercel]
+flowchart TD
+    A[Componentes UI] --> B[eventService]
+    B --> C[Supabase]
+
+    subgraph "eventService"
+        D[Operações CRUD]
+        E[Gerenciamento de Mídia]
+        F[Operações de Moderação]
+    end
 ```
 
-## Segurança
+#### Tarefas:
 
-1. **Headers HTTP**
+1. **Refatorar `src/services/eventService.ts`**:
 
-   - CSP configurado
-   - CORS restrito
-   - XSS Protection
+   - Implementar todas as operações necessárias conforme documentação
+   - Remover acessos diretos ao Supabase de outros componentes
+   - Adicionar validações de entrada
 
-2. **Dados Sensíveis**
-   - Variáveis de ambiente
-   - Secrets no Vercel
-   - Tokens encriptados
+2. **Implementar serviço de mídia**:
 
-3. **Práticas de Segurança**
-   - Sanitização de inputs
-   - Validação de dados
-   - Rate limiting
-   - Proteção contra CSRF
-   - Auditoria de logs
+   - Criar funções para upload e gerenciamento de mídia
+   - Integrar com Supabase Storage conforme regras de segurança
 
-## Performance
+3. **Documentar API do serviço**:
+   - Criar documentação clara sobre cada função e seu comportamento esperado
 
-1. **Otimizações**
+## Fase 2A: Implementação do Modal na Home
 
-   - Code splitting
-   - Lazy loading
-   - Caching
-   - Compressão de imagens
-   - Minificação de assets
+### 2A.1 Componente Modal de Eventos
 
-2. **Monitoramento**
-   - Vercel Analytics
-   - Error tracking
-   - Performance metrics
-   - User analytics
-   - Logs de servidor
+```mermaid
+flowchart TD
+    A[Home] --> B[EventsModal]
+    B --> C[EventsList]
+    C --> D[EventCard]
+    B --> E[EventFilters]
+    B --> F[EventDetails]
+```
 
-3. **Métricas Principais**
-   - First Contentful Paint (FCP)
-   - Largest Contentful Paint (LCP)
-   - Time to Interactive (TTI)
-   - First Input Delay (FID)
-   - Cumulative Layout Shift (CLS)
+#### Tarefas:
 
-## Manutenção
+1. **Criar componente `EventsModal`**:
 
-1. **Updates**
+   - Implementar modal interativo e responsivo
+   - Integrar com a Home
 
-   - Dependências atualizadas mensalmente
-   - Security patches prioritários
-   - Breaking changes documentados
+2. **Refatorar `EventsList` e `EventCard`**:
 
-2. **Backups**
-   - Supabase: diário
-   - Código: GitHub
-   - Configurações: documentadas
+   - Adaptar para exibição no modal
+   - Implementar layout responsivo conforme documentação
 
-3. **Monitoramento**
-   - Logs de erro
-   - Métricas de performance
-   - Uso de recursos
-   - Alertas automáticos
+3. **Implementar filtros**:
 
-## Próximos Passos
+   - Filtro por data
+   - Filtro por localização/proximidade
 
-1. **Curto Prazo**
+4. **Implementar visualização detalhada**:
+   - Modal de detalhes com descrição completa e mídias
 
-   - Implementar testes E2E
-   - Melhorar cobertura de testes
-   - Documentação de API
-   - Otimização de imagens
-   - Cache layer
+### 2A.2 Integração com a Home
 
-2. **Médio Prazo**
+#### Tarefas:
 
-   - PWA support
-   - Internacionalização
-   - Analytics avançado
-   - Sistema de notificações
-   - Área administrativa
+1. **Adicionar botão/menu na Home**:
 
-3. **Longo Prazo**
-   - Microsserviços
-   - Cache distribuído
-   - CDN customizado
-   - Machine Learning
-   - Chatbot de suporte
+   - Implementar acesso ao modal de eventos
+   - Garantir experiência fluida
 
-## Guias de Contribuição
+2. **Implementar carregamento otimizado**:
+   - Lazy loading para mídias
+   - Paginação ou infinite scroll
 
-1. **Setup do Ambiente**
-   - Instalação de dependências
-   - Configuração do editor
-   - Extensões recomendadas
-   - Scripts úteis
+## Fase 2B: Refatoração do Sistema de Cadastro
 
-2. **Processo de Desenvolvimento**
-   - Criação de branches
-   - Commits semânticos
-   - Code review
-   - Merge requests
+### 2B.1 Formulário de Cadastro de Eventos
 
-3. **Qualidade de Código**
-   - Testes unitários
-   - Testes de integração
-   - Code coverage
-   - Linting e formatação
+```mermaid
+flowchart TD
+    A[Painel do Usuário] --> B[EventForm]
+    B --> C[MediaUpload]
+    B --> D[LocationInput]
+    B --> E[eventService.createEvent]
+```
 
-4. **Documentação**
-   - Comentários de código
-   - README atualizado
-   - Changelog
-   - Storybook
+#### Tarefas:
+
+1. **Refatorar `EventForm`**:
+
+   - Alinhar com a estrutura de dados atualizada
+   - Implementar validações conforme regras de negócio
+   - Garantir que pelo menos uma mídia seja obrigatória
+
+2. **Implementar `MediaUpload`**:
+
+   - Criar componente para upload de imagens/vídeos
+   - Integrar com Supabase Storage
+   - Implementar preview e gerenciamento de arquivos
+
+3. **Implementar `LocationInput`**:
+   - Criar componente para entrada de localização
+   - Opcionalmente integrar com API de geolocalização
+
+### 2B.2 Integração com Autenticação
+
+#### Tarefas:
+
+1. **Garantir proteção de rotas**:
+
+   - Implementar redirecionamento para login quando necessário
+   - Verificar permissões do usuário
+
+2. **Integrar com Supabase Auth**:
+   - Garantir que o user_id seja corretamente associado aos eventos
+
+## Fase 3: Implementação do Sistema de Moderação
+
+### 3.1 Painel de Moderação
+
+```mermaid
+flowchart TD
+    A[Painel Admin] --> B[EventApprovalList]
+    B --> C[EventApprovalItem]
+    C --> D[eventService.approveEvent]
+    C --> E[eventService.rejectEvent]
+```
+
+#### Tarefas:
+
+1. **Refatorar `ApprovalList`**:
+
+   - Implementar listagem de eventos pendentes
+   - Adicionar filtros e ordenação
+
+2. **Implementar visualização detalhada para moderação**:
+
+   - Exibir todas as informações do evento
+   - Mostrar mídias para avaliação
+
+3. **Implementar ações de moderação**:
+   - Aprovar evento
+   - Reprovar evento com justificativa
+   - Opções rápidas de reprovação
+
+### 3.2 Notificações
+
+#### Tarefas:
+
+1. **Implementar sistema de notificações**:
+   - Notificar usuário sobre aprovação/reprovação
+   - Notificar administradores sobre novos eventos pendentes
+
+## Fase 4: Testes e Ajustes Finais
+
+### 4.1 Testes Automatizados
+
+#### Tarefas:
+
+1. **Implementar testes unitários**:
+
+   - Testar serviços e funções de utilidade
+   - Garantir cobertura adequada
+
+2. **Implementar testes de integração**:
+
+   - Testar fluxos completos
+   - Verificar integração com Supabase
+
+3. **Implementar testes de UI**:
+   - Testar componentes visuais
+   - Verificar responsividade
+
+### 4.2 Testes Manuais
+
+#### Tarefas:
+
+1. **Executar casos de teste conforme documentação**:
+
+   - Cadastro sem mídia → erro
+   - Cadastro com todos os campos corretos → sucesso
+   - Moderador aprova evento → status muda
+   - Moderador reprova sem justificativa → erro
+   - Usuário não autenticado → sem acesso ao formulário de evento
+   - Visualização pública → lista apenas eventos aprovados
+
+2. **Verificar experiência do usuário**:
+   - Testar em diferentes dispositivos
+   - Verificar acessibilidade
+
+### 4.3 Ajustes e Otimizações
+
+#### Tarefas:
+
+1. **Resolver problemas identificados nos testes**:
+
+   - Corrigir bugs e inconsistências
+   - Melhorar desempenho quando necessário
+
+2. **Otimizar carregamento de mídias**:
+
+   - Implementar lazy loading
+   - Otimizar tamanho de imagens
+
+3. **Documentação final**:
+   - Atualizar documentação técnica
+   - Criar documentação para usuários finais
+
+## Considerações Técnicas
+
+### Gerenciamento de Estado
+
+Recomendamos a implementação de um contexto global para eventos, utilizando React Context API ou uma biblioteca como Redux ou Zustand. Isso facilitará a comunicação entre componentes e garantirá consistência nos dados.
+
+```mermaid
+flowchart TD
+    A[EventsContext] --> B[EventsProvider]
+    B --> C[useEvents Hook]
+    C --> D[Componentes UI]
+```
+
+### Otimização de Performance
+
+Para garantir uma experiência fluida, especialmente no modal da Home, recomendamos:
+
+1. **Virtualização de listas** para renderizar apenas os itens visíveis
+2. **Lazy loading de imagens** para carregar apenas quando necessário
+3. **Memoização de componentes** para evitar re-renderizações desnecessárias
+
+### Segurança
+
+Implementar verificações de segurança em múltiplas camadas:
+
+1. **Frontend**: Verificar permissões antes de exibir opções sensíveis
+2. **Serviço**: Validar dados e permissões antes de enviar ao backend
+3. **Backend**: Implementar regras de segurança no Supabase (RLS)
+
+## Conclusão
+
+Este plano de implementação aborda as principais necessidades identificadas na documentação técnica e funcional do Módulo de Eventos do Christianitatis.org. A abordagem de refatoração profunda permitirá resolver as inconsistências de tipos e melhorar a integração entre componentes, resultando em um sistema robusto e alinhado com as expectativas.
+
+Recomendamos iniciar pela Fase 1 (Refatoração da Estrutura de Dados) para estabelecer uma base sólida, e então prosseguir com as Fases 2A e 2B em paralelo, dependendo dos recursos disponíveis.
