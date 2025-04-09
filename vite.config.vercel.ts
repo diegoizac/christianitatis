@@ -5,7 +5,7 @@ import { viteStaticCopy } from 'vite-plugin-static-copy'
 import path from 'path'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   base: '/',
   server: {
     port: 3002,
@@ -124,4 +124,4 @@ export default defineConfig({
     legalComments: 'none',
     treeShaking: true,
   },
-})
+}))

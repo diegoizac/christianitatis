@@ -15,7 +15,7 @@
     "storybook": "npx storybook dev -p 6007",
     "build-storybook": "npx storybook build",
     "build": "ROLLUP_SKIP_NATIVE=true tsc && vite build",
-    "build:vercel": "ROLLUP_SKIP_NATIVE=true cp vite-env.vercel.d.ts src/vite-env.d.ts && vite build --config vite.config.vercel.ts --mode production",
+    "build:vercel": "ROLLUP_SKIP_NATIVE=true cp vite-env.vercel.d.ts src/vite-env.d.ts && cp tsconfig.node.vercel.json tsconfig.node.json && vite build --config vite.config.vercel.ts --mode production",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "preview": "vite preview",
