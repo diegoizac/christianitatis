@@ -1,62 +1,43 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import type { Tables } from '@/lib/supabase'
+import { uploadService } from '@/services/uploadService'
+import { EventMedia as EventMediaType, CreateEventDTO } from '@/types/Event'
 
-type EventFormData = Tables['events']['Insert']
-type EventMedia = {
-  images: File[]
-  videos: File[]
+// Tipo para arquivos de mídia com preview
+interface MediaFile extends File {
+  preview?: string
 }
+
+// Tipo para o formulário de eventos
+type EventFormData = CreateEventDTO
+// Tipo para arquivos de mídia com preview
 
 export function useEventForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [media, setMedia] = useState<EventMedia>({ images: [], videos: [] })
+  const [media, setMedia] = useState<{ images: MediaFile[], videos: MediaFile[] }>({ images: [], videos: [] })
 
   const uploadMedia = async (
     files: MediaFile[],
     type: 'images' | 'videos'
-  ): Promise<
-    Array<{
-      url: string
-      size: number
-      format: string
-      name: string
-    }>
-  > => {
-    const bucket = type === 'images' ? 'event-images' : 'event-videos'
-    const maxSize = type === 'images' ? 5 * 1024 * 1024 : 100 * 1024 * 1024 // 5MB ou 100MB
-    const allowedTypes =
-      type === 'images' ? ['image/jpeg', 'image/png', 'image/webp'] : ['video/mp4', 'video/webm']
-
-    const uploads = files.map(async file => {
-      if (file.size > maxSize) {
-        throw new Error(`Arquivo ${file.name} excede o tamanho máximo permitido`)
+  ): Promise<EventMediaType[]> => {
+    try {
+      // Usar o serviço de upload existente
+      const result = type === 'images'
+        ? await uploadService.uploadMultipleImages(files)
+        : await uploadService.uploadMultipleVideos(files);
+      
+      if (result.failed.length > 0) {
+        // Lançar erro com o primeiro problema encontrado
+        throw new Error(`Falha ao enviar ${result.failed[0].file.name}: ${result.failed[0].error}`);
       }
-
-      if (!allowedTypes.includes(file.type)) {
-        throw new Error(`Tipo de arquivo não permitido: ${file.type}`)
-      }
-
-      const fileName = `${Date.now()}-${file.name}`
-      const { error: uploadError } = await supabase.storage.from(bucket).upload(fileName, file)
-
-      if (uploadError) throw uploadError
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from(bucket).getPublicUrl(fileName)
-
-      return {
-        url: publicUrl,
-        size: file.size,
-        format: file.type,
-        name: file.name,
-      }
-    })
-
-    return Promise.all(uploads)
+      
+      return result.successful;
+    } catch (error) {
+      console.error('Erro ao fazer upload de mídia:', error);
+      throw error;
+    }
   }
 
   const createEvent = async (formData: EventFormData) => {
@@ -69,15 +50,21 @@ export function useEventForm() {
       const uploadedImages = await uploadMedia(media.images, 'images')
       const uploadedVideos = await uploadMedia(media.videos, 'videos')
 
-      // Criar evento com mídia
-      const { error: eventError } = await supabase.from('events').insert({
+      // Extrair URLs para o formato esperado pelo serviço de eventos
+      const media_urls = [
+        ...uploadedImages.map(img => img.url),
+        ...uploadedVideos.map(vid => vid.url)
+      ];
+
+      // Combinar os dados do formulário com as URLs de mídia
+      const eventData = {
         ...formData,
-        media: {
-          images: uploadedImages,
-          videos: uploadedVideos,
-        },
-        status: 'draft',
-      })
+        media_urls: [...(formData.media_urls || []), ...media_urls],
+        status: formData.status || 'pendente',
+      };
+
+      // Criar evento com mídia usando o formato correto
+      const { error: eventError } = await supabase.from('events').insert(eventData)
 
       if (eventError) throw eventError
 
@@ -93,10 +80,13 @@ export function useEventForm() {
   const handleMediaChange = (files: FileList | null, type: 'images' | 'videos') => {
     if (!files) return
 
-    const mediaFiles = Array.from(files).map(file => ({
-      ...file,
-      preview: type === 'images' ? URL.createObjectURL(file) : undefined,
-    })) as MediaFile[]
+    const mediaFiles = Array.from(files).map(file => {
+      const mediaFile = file as MediaFile;
+      if (type === 'images') {
+        mediaFile.preview = URL.createObjectURL(file);
+      }
+      return mediaFile;
+    });
 
     setMedia(prev => ({
       ...prev,
@@ -106,17 +96,17 @@ export function useEventForm() {
 
   const removeMedia = (index: number, type: 'images' | 'videos') => {
     setMedia(prev => {
-      const newMedia = {
+      const mediaToRemove = prev[type][index] as MediaFile;
+      
+      // Limpar previews para evitar memory leaks
+      if (type === 'images' && mediaToRemove.preview) {
+        URL.revokeObjectURL(mediaToRemove.preview);
+      }
+
+      return {
         ...prev,
         [type]: prev[type].filter((_, i) => i !== index),
-      }
-
-      // Limpar previews para evitar memory leaks
-      if (type === 'images') {
-        prev[type][index].preview && URL.revokeObjectURL(prev[type][index].preview)
-      }
-
-      return newMedia
+      };
     })
   }
 

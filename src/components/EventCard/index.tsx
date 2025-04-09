@@ -44,7 +44,7 @@ export default function EventCard({
   const time = date.includes('T') ? date.split('T')[1].substring(0, 5) : ''
 
   // Determinar imagem a ser exibida
-  const imageUrl = media_urls && media_urls.length > 0 ? media_urls[0] : '/placeholder-event.jpg'
+  const imageUrl = media_urls && media_urls.length > 0 ? media_urls[0] : '/images/placeholder.svg'
 
   // Mapear status para cores e textos
   const statusConfig = {
@@ -115,6 +115,7 @@ export default function EventCard({
         )}
       >
         <motion.img
+          loading="lazy"
           src={imageUrl}
           alt={title}
           className="w-full h-full object-cover"
@@ -122,6 +123,12 @@ export default function EventCard({
           transition={{ duration: 0.5 }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-100/50 via-transparent to-transparent md:bg-gradient-to-r" />
+        {!media_urls ||
+          (media_urls.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+              <span className="text-gray-400 text-sm">Sem imagem disponível</span>
+            </div>
+          ))}
       </div>
 
       <div className={clsx('relative flex flex-col', compact ? 'p-4' : 'p-8 md:p-10 md:w-3/5')}>

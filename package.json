@@ -15,6 +15,7 @@
     "storybook": "npx storybook dev -p 6007",
     "build-storybook": "npx storybook build",
     "build": "ROLLUP_SKIP_NATIVE=true tsc && vite build",
+    "build:vercel": "ROLLUP_SKIP_NATIVE=true tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "preview": "vite preview",
@@ -29,6 +30,7 @@
     "test-storybook": "test-storybook --coverage",
     "coverage-report": "npx nyc report --reporter=html && open coverage/index.html",
     "upload-assets": "tsx src/scripts/uploadImages.ts",
+    "deploy": "./scripts/deploy-vercel.sh",
     "init-buckets": "tsx src/scripts/initBuckets.ts"
   },
   "dependencies": {
@@ -41,7 +43,6 @@
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "@react-three/postprocessing": "^3.0.4",
-    "@rollup/rollup-darwin-x64": "^4.39.0",
     "@supabase/supabase-js": "^2.49.4",
     "@types/dompurify": "^3.0.5",
     "@types/nodemailer": "^6.4.17",
@@ -158,5 +159,10 @@
     "vite-plugin-static-copy": "^1.0.1",
     "vitest": "^3.1.1",
     "winston": "^3.17.0"
+  },
+  "overrides": {
+    "rollup": {
+      "@rollup/rollup-linux-x64-gnu": "4.39.0"
+    }
   }
 }

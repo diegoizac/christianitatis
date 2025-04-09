@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { Header } from './Header'
 import { Footer } from './Footer'
@@ -129,11 +129,13 @@ export function Layout({ children, setActiveModal }: LayoutProps): JSX.Element {
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-lg border-2 border-gray-200">
                 <div className="flex flex-col items-center space-y-4">
-                  <img
-                    src="/logo-main.png"
-                    alt="Logo Christianitatis"
-                    className="w-48 h-auto mb-4"
-                  />
+                  <Link to="/">
+                    <img
+                      src="/logo-main.png"
+                      alt="Logo Christianitatis"
+                      className="w-48 h-auto mb-4"
+                    />
+                  </Link>
                   <img
                     src="/src/assets/images/PIX-Christianitatis.png"
                     alt="QR Code PIX"

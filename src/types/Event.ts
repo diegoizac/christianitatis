@@ -60,6 +60,7 @@ export interface CreateEventDTO {
   lat?: number
   lng?: number
   media_urls: string[]
+  capacity?: number           // Capacidade máxima de participantes
   user_id?: string            // Opcional pois pode ser obtido do contexto de autenticação
   status?: EventStatus        // Opcional pois normalmente será 'pendente' por padrão
 }
